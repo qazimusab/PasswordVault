@@ -1,32 +1,17 @@
 package com.trendoidtechnologies.vault.ui;
 
-import android.annotation.TargetApi;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.app.LoaderManager.LoaderCallbacks;
-
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
-
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,15 +21,11 @@ import com.trendoidtechnologies.vault.datacontract.User;
 import com.trendoidtechnologies.vault.service.Session;
 import com.trendoidtechnologies.vault.service.VaultService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static android.Manifest.permission.READ_CONTACTS;
 
 /**
  * A login screen that offers login via email/password.
@@ -52,18 +33,18 @@ import static android.Manifest.permission.READ_CONTACTS;
 public class LoginActivity extends BaseActivity {
 
 
-    // UI references.
-    Button mEmailSignInButton;
-    private AutoCompleteTextView mEmailView;
+    private Button mEmailSignInButton;
+    private EditText mEmailView;
     private EditText mPasswordView;
-    private View mProgressView;
+    private ProgressBar mProgressView;
+    private LinearLayout linearLayout;
 
     @Override
     protected void initializeView() {
         setTitle(getString(R.string.login_page_title));
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-        mProgressView = findViewById(R.id.login_progress);
-
+        mEmailView = (EditText) findViewById(R.id.email);
+        mProgressView = (ProgressBar)findViewById(R.id.login_progress);
+        linearLayout = (LinearLayout) findViewById(R.id.linearLayoutLoginContainer);
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -83,6 +64,7 @@ public class LoginActivity extends BaseActivity {
     View.OnClickListener signInOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View view) {
+
             login();
         }
     };
@@ -99,8 +81,14 @@ public class LoginActivity extends BaseActivity {
         return R.layout.activity_login;
     }
 
+    private void toggleProgress(boolean loading) {
+        linearLayout.setVisibility(loading ? View.GONE : View.VISIBLE);
+        mEmailSignInButton.setVisibility(loading ? View.GONE : View.VISIBLE);
+        mProgressView.setVisibility(loading ? View.VISIBLE : View.GONE);
+    }
 
     private void login(){
+        toggleProgress(true);
         final Intent intent = new Intent(LoginActivity.this, DepartmentsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -120,30 +108,33 @@ public class LoginActivity extends BaseActivity {
                                 finish();
                             }
                             else {
+                                toggleProgress(false);
                                 Toast.makeText(getApplicationContext(), "You were successfully authenticated by then something went wrong. :(", Toast.LENGTH_LONG).show();
                             }
                         }
 
                         @Override
                         public void onFailure(Call<User> call, Throwable t) {
+                            toggleProgress(false);
                             Toast.makeText(getApplicationContext(), "You were successfully authenticated by then something went wrong. :(", Toast.LENGTH_LONG).show();
                         }
                     });
                 }
                 else {
-                    Session.token = null;
+                    toggleProgress(false);
+                    Session.clearSession(); 
                     Toast.makeText(getApplicationContext(), "You username or password is incorrect.", Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Token> call, Throwable t) {
-                Session.token = null;
+                toggleProgress(false);
+                Session.clearSession();
                 Toast.makeText(getApplicationContext(), "You username or password is incorrect.", Toast.LENGTH_LONG).show();
             }
         });
     }
-
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -191,6 +182,7 @@ public class LoginActivity extends BaseActivity {
             //showProgress(true);
         }
     }
+
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
         return email.contains("@");

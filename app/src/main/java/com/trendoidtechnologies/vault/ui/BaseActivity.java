@@ -160,6 +160,7 @@ public abstract class BaseActivity extends DrawerActivity {
                 navigateToActivity(UsersActivity.class);
                 break;
             case LOGOUT:
+                Session.clearSession();
                 navigateToActivity(LoginActivity.class);
                 break;
         }

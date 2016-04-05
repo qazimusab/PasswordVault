@@ -9,4 +9,9 @@ import com.trendoidtechnologies.vault.datacontract.User;
 public class Session {
     public static Token token;
     public static User user;
+
+    public static void clearSession() {
+        token = null;
+        user = null;
+    }
 }

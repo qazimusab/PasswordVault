@@ -11,6 +11,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:id="@+id/linearLayoutLoginContainer"
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:layout_below="@+id/toolbar"
@@ -20,14 +21,6 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin">
 
-        <!-- Login progress -->
-        <ProgressBar
-            android:id="@+id/login_progress"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/email_login_form"
@@ -54,13 +47,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <AutoCompleteTextView
+                    <EditText
                         android:id="@+id/email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/AutoCompleteTextViewAppTheme"
                         android:hint="@string/prompt_username"
                         android:inputType="textEmailAddress"
+                        android:nextFocusDown= "@+id/password"
                         android:maxLines="1"
                         android:singleLine="true" />
 
@@ -97,4 +91,14 @@
         android:layout_margin="16dp"
         android:text="@string/action_sign_in"
         android:transitionName="button"/>
+
+    <!-- Login progress -->
+    <ProgressBar
+        android:id="@+id/login_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone" />
 </RelativeLayout>
