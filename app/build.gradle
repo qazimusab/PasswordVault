@@ -29,5 +29,8 @@ dependencies {
     compile 'com.android.support:design:23.+'
     compile 'com.github.nirhart:parallaxscroll:1.0'
     compile 'com.balysv:material-ripple:1.0.2'
+    compile 'com.squareup.retrofit2:retrofit:2.0.1'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.1'
+    compile 'org.apache.commons:commons-lang3:3.0'
     compile project(':library')
 }

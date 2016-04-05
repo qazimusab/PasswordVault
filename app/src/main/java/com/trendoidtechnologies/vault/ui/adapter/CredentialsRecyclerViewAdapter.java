@@ -98,11 +98,11 @@ public class CredentialsRecyclerViewAdapter extends RecyclerView.Adapter<Credent
 
         @SuppressLint("SetTextI18n")
         public void setCredentials(Credential credential){
-            username.setText("Username: " + credential.getUsername());
+            username.setText("Username: " + credential.getUserName());
             password.setText("Password: " + credential.getPassword());
             this.credential = credential;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                username.setTransitionName(credential.getUsername());
+                username.setTransitionName(credential.getUserName());
                 password.setTransitionName(credential.getPassword());
             }
         }

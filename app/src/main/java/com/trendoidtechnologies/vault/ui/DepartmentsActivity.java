@@ -10,8 +10,11 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.TextView;
 
 import com.trendoidtechnologies.vault.R;
+import com.trendoidtechnologies.vault.datacontract.Permission;
+import com.trendoidtechnologies.vault.service.Session;
 import com.trendoidtechnologies.vault.ui.adapter.RecyclerViewAdapter;
 import com.trendoidtechnologies.vault.ui.widgets.DividerItemDecoration;
 
@@ -22,6 +25,7 @@ public class DepartmentsActivity extends BaseActivity {
     private LinearLayoutManager linearLayoutManager;
     private RecyclerViewAdapter myRecyclerViewAdapter;
     public static String DEPARTMENT_KEY = "department";
+    private TextView expandedImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,17 +34,21 @@ public class DepartmentsActivity extends BaseActivity {
 
     @Override
     protected void initializeView() {
-
+        expandedImage = (TextView) findViewById(R.id.expandedImage);
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(DepartmentsActivity.this, AddDepartmentActivity.class);
                 ActivityOptionsCompat options = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation(DepartmentsActivity.this, fab, "fab_transition");
+                        makeSceneTransitionAnimation(DepartmentsActivity.this, expandedImage, "button");
                 startActivity(intent, options.toBundle());
             }
         });
+
+        if(!Session.user.isAdmin()) {
+            fab.setVisibility(View.GONE);
+        }
 
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         setCollapsingToolbarLayoutTitle(getString(R.string.departments_page_title));
@@ -54,14 +62,10 @@ public class DepartmentsActivity extends BaseActivity {
         myRecyclerViewAdapter = new RecyclerViewAdapter(this);
         myRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
 
+        for(Permission permission : Session.user.getPermissions()) {
 
-        myRecyclerViewAdapter.add("Software Engineering");
-        myRecyclerViewAdapter.add("Information Technology");
-        myRecyclerViewAdapter.add("Mechanical Engineering");
-        myRecyclerViewAdapter.add("Computer Science");
-        myRecyclerViewAdapter.add("Game Design");
-        myRecyclerViewAdapter.add("Biology");
-        myRecyclerViewAdapter.add("Mathematics");
+            myRecyclerViewAdapter.add(permission.getDepartmentName());
+        }
 
         departmentsListView.setAdapter(myRecyclerViewAdapter);
         departmentsListView.setItemAnimator(new DefaultItemAnimator());

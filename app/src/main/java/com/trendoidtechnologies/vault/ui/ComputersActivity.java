@@ -17,8 +17,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.trendoidtechnologies.vault.R;
+import com.trendoidtechnologies.vault.datacontract.Computer;
+import com.trendoidtechnologies.vault.datacontract.Permission;
+import com.trendoidtechnologies.vault.service.Session;
 import com.trendoidtechnologies.vault.ui.adapter.RecyclerViewAdapter;
 import com.trendoidtechnologies.vault.ui.widgets.DividerItemDecoration;
+
+import java.util.List;
 
 public class ComputersActivity extends BaseActivity {
 
@@ -51,7 +56,6 @@ public class ComputersActivity extends BaseActivity {
             }
         });
 
-
         department = getExtras().getString(DepartmentsActivity.DEPARTMENT_KEY);
 
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
@@ -69,16 +73,13 @@ public class ComputersActivity extends BaseActivity {
         myRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
 
 
-        myRecyclerViewAdapter.add("Computer 1");
-        myRecyclerViewAdapter.add("Computer 2");
-        myRecyclerViewAdapter.add("Computer 3");
-        myRecyclerViewAdapter.add("Computer 4");
-        myRecyclerViewAdapter.add("Computer 5");
-        myRecyclerViewAdapter.add("Computer 6");
-        myRecyclerViewAdapter.add("Computer 7");
-        myRecyclerViewAdapter.add("Computer 8");
-        myRecyclerViewAdapter.add("Computer 9");
-        myRecyclerViewAdapter.add("Computer 10");
+        for(Permission permissions : Session.user.getPermissions()){
+            if(permissions.getDepartmentName().equals(department)) {
+                for(Computer computer : permissions.getComputers()){
+                    myRecyclerViewAdapter.add(computer.getComputerName());
+                }
+            }
+        }
 
         computersListView.setAdapter(myRecyclerViewAdapter);
         computersListView.setItemAnimator(new DefaultItemAnimator());
@@ -107,6 +108,7 @@ public class ComputersActivity extends BaseActivity {
 //                    .show();
             Bundle bundle = new Bundle();
             bundle.putString(COMPUTER_KEY, itemValue);
+            bundle.putString(DepartmentsActivity.DEPARTMENT_KEY, department);
             Intent intent = new Intent(ComputersActivity.this, CredentialsActivity.class);
             intent.putExtras(bundle);
             ActivityOptionsCompat options = ActivityOptionsCompat.

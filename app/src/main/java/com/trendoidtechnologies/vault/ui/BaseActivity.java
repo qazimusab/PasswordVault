@@ -13,6 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import com.trendoidtechnologies.vault.R;
+import com.trendoidtechnologies.vault.service.Session;
+import com.trendoidtechnologies.vault.service.VaultApiClient;
 
 import trendoidtechnologies.com.navigationdrawerlibrary.DrawerActivity;
 import trendoidtechnologies.com.navigationdrawerlibrary.structure.DrawerItem;
@@ -28,6 +30,7 @@ import java.util.List;
  */
 public abstract class BaseActivity extends DrawerActivity {
 
+    VaultApiClient vaultApiClient;
     private Bundle extras;
     protected Toolbar toolbar;
     private List<DrawerItem> navigationItems;
@@ -44,55 +47,107 @@ public abstract class BaseActivity extends DrawerActivity {
         setContentView(activityToInflate());
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        vaultApiClient = new VaultApiClient(getApplicationContext());
         initializeView();
         onViewCreated();
     }
 
     protected void onViewCreated(){
-        navigationItems = new ArrayList<>();
-        navigationItems.add(new DrawerItem()
-                .setTextPrimary(getString(R.string.navigation_item_my_departments))
-                .setImage(ContextCompat.getDrawable(this, R.drawable.departments)));
-        navigationItems.add(new DrawerItem()
-                .setTextPrimary(getString(R.string.navigation_item_users))
-                .setImage(ContextCompat.getDrawable(this, R.drawable.users)));
-        navigationItems.add(new DrawerItem()
-                .setTextPrimary(getString(R.string.navigation_item_log_out))
-                .setImage(ContextCompat.getDrawable(this, R.drawable.logout)));
-        setDrawerTheme(
-                new DrawerTheme(this)
-                        .setBackgroundColorRes(R.color.colorPrimary)
-                        .setTextColorPrimaryRes(R.color.white)
-                        .setTextColorSecondaryRes(R.color.lightGray)
-        );
+        if(this instanceof LoginActivity) {
 
-        addItems(navigationItems);
-        setOnItemClickListener(new DrawerItem.OnItemClickListener() {
-            @Override
-            public void onClick(DrawerItem item, long id, int position) {
-                selectItem(position);
-                Toast.makeText(BaseActivity.this, "Clicked item #" + position, Toast.LENGTH_SHORT).show();
-                switch (position){
-                    case 0:
-                        navigateToItem(NavigationItem.DEPARTMENTS);
-                        break;
-                    case 1:
-                        navigateToItem(NavigationItem.USERS);
-                        break;
-                    case 2:
-                        navigateToItem(NavigationItem.LOGOUT);
-                        break;
+        }
+        else {
+            setDrawer();
+        }
+    }
+
+    protected void setDrawer() {
+        if(Session.user.isAdmin()) {
+            navigationItems = new ArrayList<>();
+            navigationItems.add(new DrawerItem()
+                    .setTextPrimary(getString(R.string.navigation_item_my_departments))
+                    .setImage(ContextCompat.getDrawable(this, R.drawable.departments)));
+            navigationItems.add(new DrawerItem()
+                    .setTextPrimary(getString(R.string.navigation_item_users))
+                    .setImage(ContextCompat.getDrawable(this, R.drawable.users)));
+            navigationItems.add(new DrawerItem()
+                    .setTextPrimary(getString(R.string.navigation_item_log_out))
+                    .setImage(ContextCompat.getDrawable(this, R.drawable.logout)));
+            setDrawerTheme(
+                    new DrawerTheme(this)
+                            .setBackgroundColorRes(R.color.colorPrimary)
+                            .setTextColorPrimaryRes(R.color.white)
+                            .setTextColorSecondaryRes(R.color.lightGray)
+            );
+
+            addItems(navigationItems);
+            setOnItemClickListener(new DrawerItem.OnItemClickListener() {
+                @Override
+                public void onClick(DrawerItem item, long id, int position) {
+                    selectItem(position);
+                    Toast.makeText(BaseActivity.this, "Clicked item #" + position, Toast.LENGTH_SHORT).show();
+                    switch (position) {
+                        case 0:
+                            navigateToItem(NavigationItem.DEPARTMENTS);
+                            break;
+                        case 1:
+                            navigateToItem(NavigationItem.USERS);
+                            break;
+                        case 2:
+                            navigateToItem(NavigationItem.LOGOUT);
+                            break;
+                    }
                 }
-            }
-        });
+            });
 
-        addProfile(new DrawerProfile()
-                .setId(1)
-                .setRoundedAvatar((BitmapDrawable)getResources().getDrawable(R.drawable.profile_avatar))
-                .setBackground(ContextCompat.getDrawable(this, R.drawable.nav_drawer_header2))
-                .setName("Qazi Musab")
-                .setDescription("Administrator")
-        );
+            addProfile(new DrawerProfile()
+                    .setId(1)
+                    .setRoundedAvatar((BitmapDrawable) getResources().getDrawable(R.drawable.profile_avatar))
+                    .setBackground(ContextCompat.getDrawable(this, R.drawable.nav_drawer_header2))
+                    .setName(Session.user.getFirstName() + " " + Session.user.getLastName())
+                    .setDescription("Administrator")
+            );
+        }
+        else {
+            navigationItems = new ArrayList<>();
+            navigationItems.add(new DrawerItem()
+                    .setTextPrimary(getString(R.string.navigation_item_my_departments))
+                    .setImage(ContextCompat.getDrawable(this, R.drawable.departments)));
+            navigationItems.add(new DrawerItem()
+                    .setTextPrimary(getString(R.string.navigation_item_log_out))
+                    .setImage(ContextCompat.getDrawable(this, R.drawable.logout)));
+            setDrawerTheme(
+                    new DrawerTheme(this)
+                            .setBackgroundColorRes(R.color.colorPrimary)
+                            .setTextColorPrimaryRes(R.color.white)
+                            .setTextColorSecondaryRes(R.color.lightGray)
+            );
+
+            addItems(navigationItems);
+            setOnItemClickListener(new DrawerItem.OnItemClickListener() {
+                @Override
+                public void onClick(DrawerItem item, long id, int position) {
+                    selectItem(position);
+                    Toast.makeText(BaseActivity.this, "Clicked item #" + position, Toast.LENGTH_SHORT).show();
+                    switch (position) {
+                        case 0:
+                            navigateToItem(NavigationItem.DEPARTMENTS);
+                            break;
+                        case 1:
+                            navigateToItem(NavigationItem.LOGOUT);
+                            break;
+                    }
+                }
+            });
+
+            addProfile(new DrawerProfile()
+                    .setId(1)
+                    .setRoundedAvatar((BitmapDrawable) getResources().getDrawable(R.drawable.profile_avatar))
+                    .setBackground(ContextCompat.getDrawable(this, R.drawable.nav_drawer_header2))
+                    .setName(Session.user.getFirstName() + " " + Session.user.getLastName())
+                    .setDescription("User")
+            );
+        }
     }
 
     protected void navigateToItem(NavigationItem navigationItem){

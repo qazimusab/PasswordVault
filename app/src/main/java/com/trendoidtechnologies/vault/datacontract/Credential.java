@@ -1,30 +1,109 @@
+
 package com.trendoidtechnologies.vault.datacontract;
 
-/**
- * Created by qazimusab on 2/26/16.
- */
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class Credential {
-    private String username;
-    private String password;
 
-    public Credential(String username, String password) {
-        this.username = username;
-        this.password = password;
+    @SerializedName("UserName")
+    @Expose
+    private String UserName;
+    @SerializedName("Password")
+    @Expose
+    private String Password;
+    @SerializedName("Type")
+    @Expose
+    private String Type;
+
+    /**
+     * No args constructor for use in serialization
+     * 
+     */
+    public Credential() {
     }
 
+    /**
+     *
+     * @param Password
+     * @param UserName
+     */
+    public Credential(String UserName, String Password) {
+        this.UserName = UserName;
+        this.Password = Password;
+    }
+
+    /**
+     *
+     * @param Type
+     * @param Password
+     * @param UserName
+     */
+    public Credential(String UserName, String Password, String Type) {
+        this.UserName = UserName;
+        this.Password = Password;
+        this.Type = Type;
+    }
+
+    /**
+     * 
+     * @return
+     *     The UserName
+     */
+    public String getUserName() {
+        return UserName;
+    }
+
+    /**
+     * 
+     * @param UserName
+     *     The UserName
+     */
+    public void setUserName(String UserName) {
+        this.UserName = UserName;
+    }
+
+    /**
+     * 
+     * @return
+     *     The Password
+     */
     public String getPassword() {
-        return password;
+        return Password;
     }
 
-    public String getUsername() {
-        return username;
+    /**
+     * 
+     * @param Password
+     *     The Password
+     */
+    public void setPassword(String Password) {
+        this.Password = Password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    /**
+     * 
+     * @return
+     *     The Type
+     */
+    public String getType() {
+        return Type;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    /**
+     * 
+     * @param Type
+     *     The Type
+     */
+    public void setType(String Type) {
+        this.Type = Type;
     }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
+
 }

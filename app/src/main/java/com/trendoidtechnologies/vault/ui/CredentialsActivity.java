@@ -14,20 +14,23 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
 
+import com.trendoidtechnologies.vault.datacontract.Computer;
 import com.trendoidtechnologies.vault.datacontract.Credential;
 import com.trendoidtechnologies.vault.R;
+import com.trendoidtechnologies.vault.datacontract.Permission;
+import com.trendoidtechnologies.vault.service.Session;
 import com.trendoidtechnologies.vault.ui.adapter.CredentialsRecyclerViewAdapter;
 import com.trendoidtechnologies.vault.ui.widgets.DividerItemDecoration;
 
 public class CredentialsActivity extends BaseActivity {
 
-    private String computer;
+    private String departmentName;
+    private String computerName;
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private RecyclerView credentialsListView;
     private LinearLayoutManager linearLayoutManager;
     private CredentialsRecyclerViewAdapter credentialsRecyclerViewAdapter;
     private TextView expandedImage;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +52,13 @@ public class CredentialsActivity extends BaseActivity {
             }
         });
 
-        computer = getExtras().getString(ComputersActivity.COMPUTER_KEY);
+        computerName = getExtras().getString(ComputersActivity.COMPUTER_KEY);
+        departmentName = getExtras().getString(DepartmentsActivity.DEPARTMENT_KEY);
 
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimaryDark));
         collapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(R.color.white));
-        setCollapsingToolbarLayoutTitle(computer);
+        setCollapsingToolbarLayoutTitle(computerName);
 
         credentialsListView = (RecyclerView) findViewById(R.id.departments_list);
         linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -65,16 +69,17 @@ public class CredentialsActivity extends BaseActivity {
         credentialsRecyclerViewAdapter = new CredentialsRecyclerViewAdapter(this);
         credentialsRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
 
-
-        credentialsRecyclerViewAdapter.add(new Credential("admin", "password"));
-        credentialsRecyclerViewAdapter.add(new Credential("admin", "password"));
-        credentialsRecyclerViewAdapter.add(new Credential("admin", "password"));
-        credentialsRecyclerViewAdapter.add(new Credential("admin", "password"));
-        credentialsRecyclerViewAdapter.add(new Credential("admin", "password"));
-        credentialsRecyclerViewAdapter.add(new Credential("admin", "password"));
-        credentialsRecyclerViewAdapter.add(new Credential("admin", "password"));
-        credentialsRecyclerViewAdapter.add(new Credential("admin", "password"));
-        credentialsRecyclerViewAdapter.add(new Credential("admin", "password"));
+        for(Permission permissions : Session.user.getPermissions()){
+            if(permissions.getDepartmentName().equals(departmentName)) {
+                for(Computer computer : permissions.getComputers()){
+                    if(computer.getComputerName().equals(computerName)) {
+                        for(Credential credential : computer.getCredentials()) {
+                            credentialsRecyclerViewAdapter.add(credential);
+                        }
+                    }
+                }
+            }
+        }
 
         credentialsListView.setAdapter(credentialsRecyclerViewAdapter);
         credentialsListView.setItemAnimator(new DefaultItemAnimator());
