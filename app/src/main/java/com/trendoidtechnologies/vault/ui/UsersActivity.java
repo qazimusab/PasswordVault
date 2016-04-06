@@ -23,7 +23,7 @@ public class UsersActivity extends BaseActivity {
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private RecyclerView departmentsListView;
     private LinearLayoutManager linearLayoutManager;
-    private UsersRecyclerViewAdapter myRecyclerViewAdapter;
+    private UsersRecyclerViewAdapter usersRecyclerViewAdapter;
     private TextView expandedImage;
 
     @Override
@@ -54,17 +54,22 @@ public class UsersActivity extends BaseActivity {
 
         departmentsListView.setHasFixedSize(true);
         departmentsListView.setLayoutManager(linearLayoutManager);
-        myRecyclerViewAdapter = new UsersRecyclerViewAdapter(this);
-        myRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
+        usersRecyclerViewAdapter = new UsersRecyclerViewAdapter(this);
+        usersRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
 
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        usersRecyclerViewAdapter.clear();
         for(User user : Session.allUsers) {
-            myRecyclerViewAdapter.add(user);
+            usersRecyclerViewAdapter.add(user);
         }
 
-        departmentsListView.setAdapter(myRecyclerViewAdapter);
+        departmentsListView.setAdapter(usersRecyclerViewAdapter);
         departmentsListView.setItemAnimator(new DefaultItemAnimator());
-
     }
 
     private void setCollapsingToolbarLayoutTitle(String title) {
@@ -78,7 +83,7 @@ public class UsersActivity extends BaseActivity {
     private UsersRecyclerViewAdapter.OnItemClickListener onItemClickListener = new UsersRecyclerViewAdapter.OnItemClickListener() {
         @Override
         public void onItemClick(UsersRecyclerViewAdapter.ItemHolder item, int position) {
-            User itemValue = myRecyclerViewAdapter.getUserAtPosition(position);
+            User itemValue = usersRecyclerViewAdapter.getUserAtPosition(position);
             Session.currentUser = itemValue;
         }
     };

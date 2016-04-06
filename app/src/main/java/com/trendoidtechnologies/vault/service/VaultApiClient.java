@@ -160,6 +160,7 @@ public class VaultApiClient {
             @Override
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
                 if(response.isSuccessful()) {
+                    Session.allUsers = response.body();
                     onCallCompleted.onSuccess();
                 }
                 else {

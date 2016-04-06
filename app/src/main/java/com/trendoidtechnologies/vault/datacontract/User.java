@@ -67,20 +67,16 @@ public class User {
      * @param Email
      * @param Password
      * @param FirstName
-     * @param Id
      * @param IsAdmin
      * @param LastName
-     * @param Permissions
      */
-    public User(String FirstName, String LastName, String Password, String ConfirmPassword, String Email, String Id, boolean IsAdmin, List<Permission> Permissions) {
+    public User(String FirstName, String LastName, String Password, String ConfirmPassword, String Email, boolean IsAdmin) {
         this.FirstName = FirstName;
         this.LastName = LastName;
         this.Password = Password;
         this.ConfirmPassword = ConfirmPassword;
         this.Email = Email;
-        this.Id = Id;
         this.IsAdmin = IsAdmin;
-        this.Permissions = Permissions;
     }
 
     /**

@@ -87,7 +87,7 @@ public class AddUserActivity extends BaseActivity {
         else {
             hideSoftKeyboard();
             toggleProgress(true);
-            User userToAdd = new User(firstName, lastName, password, email, confirmPassword, email, false, null);
+            User userToAdd = new User(firstName, lastName, password, confirmPassword, email, false);
             vaultApiClient.addUser(userToAdd, new VaultApiClient.OnCallCompleted() {
                 @Override
                 public void onSuccess() {
@@ -149,7 +149,9 @@ public class AddUserActivity extends BaseActivity {
         mFirstNameEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mLastNameEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mPasswordEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        mConfirmPasswordEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mLastNameEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        mAddUserBtn.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mProgress.setVisibility(isLoading ? View.VISIBLE : View.GONE);
     }
 

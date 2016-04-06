@@ -53,6 +53,10 @@ public class UsersRecyclerViewAdapter extends RecyclerView.Adapter<UsersRecycler
         return onItemClickListener;
     }
 
+    public void clear() {
+        itemsName.clear();
+    }
+
     public interface OnItemClickListener{
         void onItemClick(ItemHolder item, int position);
     }
