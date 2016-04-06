@@ -65,7 +65,9 @@ public class UsersActivity extends BaseActivity {
 
         usersRecyclerViewAdapter.clear();
         for(User user : Session.allUsers) {
-            usersRecyclerViewAdapter.add(user);
+            if(!user.isAdmin()) {
+                usersRecyclerViewAdapter.add(user);
+            }
         }
 
         departmentsListView.setAdapter(usersRecyclerViewAdapter);

@@ -84,6 +84,9 @@ public class AddUserActivity extends BaseActivity {
         else if(!password.equals(confirmPassword)){
             Toast.makeText(getApplicationContext(), "Passwords do not match.", Toast.LENGTH_LONG).show();
         }
+        else if(isEmailTaken(email)){
+            Toast.makeText(getApplicationContext(), "There is already an account associated with that email address.", Toast.LENGTH_LONG).show();
+        }
         else {
             hideSoftKeyboard();
             toggleProgress(true);
@@ -126,6 +129,16 @@ public class AddUserActivity extends BaseActivity {
                 }
             });
         }
+    }
+
+    private boolean isEmailTaken(String email) {
+        boolean isEmailTaken = false;
+        for(User user : Session.allUsers){
+            if(email.equals(user.getEmail())){
+                isEmailTaken = true;
+            }
+        }
+        return isEmailTaken;
     }
 
     private boolean isEmailValid(String email) {
