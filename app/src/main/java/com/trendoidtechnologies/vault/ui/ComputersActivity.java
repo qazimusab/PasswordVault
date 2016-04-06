@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,10 +19,8 @@ import com.trendoidtechnologies.vault.R;
 import com.trendoidtechnologies.vault.datacontract.Computer;
 import com.trendoidtechnologies.vault.datacontract.Permission;
 import com.trendoidtechnologies.vault.service.Session;
-import com.trendoidtechnologies.vault.ui.adapter.RecyclerViewAdapter;
+import com.trendoidtechnologies.vault.ui.adapter.ComputerRecyclerViewAdapter;
 import com.trendoidtechnologies.vault.ui.widgets.DividerItemDecoration;
-
-import java.util.List;
 
 public class ComputersActivity extends BaseActivity {
 
@@ -31,18 +28,38 @@ public class ComputersActivity extends BaseActivity {
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private RecyclerView computersListView;
     private LinearLayoutManager linearLayoutManager;
-    private RecyclerViewAdapter myRecyclerViewAdapter;
+    private ComputerRecyclerViewAdapter computerRecyclerViewAdapter;
     private TextView expandedImage;
-    public static String COMPUTER_KEY = "computer";
 
+
+    @Override
+    public void onBackPressed() {
+        Session.currentDepartment = "";
+        super.onBackPressed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         expandedImage = (TextView) findViewById(R.id.expandedImage);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            expandedImage.setTransitionName(getExtras().getString(DepartmentsActivity.DEPARTMENT_KEY));
+            expandedImage.setTransitionName(Session.currentDepartment);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        computerRecyclerViewAdapter.clear();
+        for(Permission permissions : Session.user.getPermissions()){
+            if(permissions.getDepartmentName().equals(department)) {
+                for(Computer computer : permissions.getComputers()){
+                    computerRecyclerViewAdapter.add(computer);
+                }
+            }
+        }
+        computersListView.setAdapter(computerRecyclerViewAdapter);
+        computersListView.setItemAnimator(new DefaultItemAnimator());
     }
 
     @Override
@@ -51,12 +68,14 @@ public class ComputersActivity extends BaseActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(ComputersActivity.this, AddComputerActivity.class);
+                ActivityOptionsCompat options = ActivityOptionsCompat.
+                        makeSceneTransitionAnimation(ComputersActivity.this, expandedImage, "button");
+                startActivity(intent, options.toBundle());
             }
         });
 
-        department = getExtras().getString(DepartmentsActivity.DEPARTMENT_KEY);
+        department = Session.currentDepartment;
 
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimaryDark));
@@ -69,20 +88,8 @@ public class ComputersActivity extends BaseActivity {
 
         computersListView.setHasFixedSize(true);
         computersListView.setLayoutManager(linearLayoutManager);
-        myRecyclerViewAdapter = new RecyclerViewAdapter(this);
-        myRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
-
-
-        for(Permission permissions : Session.user.getPermissions()){
-            if(permissions.getDepartmentName().equals(department)) {
-                for(Computer computer : permissions.getComputers()){
-                    myRecyclerViewAdapter.add(computer.getComputerName());
-                }
-            }
-        }
-
-        computersListView.setAdapter(myRecyclerViewAdapter);
-        computersListView.setItemAnimator(new DefaultItemAnimator());
+        computerRecyclerViewAdapter = new ComputerRecyclerViewAdapter(this);
+        computerRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
 
     }
 
@@ -93,17 +100,14 @@ public class ComputersActivity extends BaseActivity {
         collapsingToolbarLayout.setExpandedTitleTypeface(Typeface.DEFAULT_BOLD);
     }
 
-    private RecyclerViewAdapter.OnItemClickListener onItemClickListener = new RecyclerViewAdapter.OnItemClickListener() {
+    private ComputerRecyclerViewAdapter.OnItemClickListener onItemClickListener = new ComputerRecyclerViewAdapter.OnItemClickListener() {
         @Override
-        public void onItemClick(RecyclerViewAdapter.ItemHolder item, int position) {
-            String itemValue = myRecyclerViewAdapter.getItemAtPosition(position);
-            Bundle bundle = new Bundle();
-            bundle.putString(COMPUTER_KEY, itemValue);
-            bundle.putString(DepartmentsActivity.DEPARTMENT_KEY, department);
+        public void onItemClick(ComputerRecyclerViewAdapter.ItemHolder item, int position) {
+            Computer itemValue = computerRecyclerViewAdapter.getItemAtPosition(position);
+            Session.currentComputer = itemValue;
             Intent intent = new Intent(ComputersActivity.this, CredentialsActivity.class);
-            intent.putExtras(bundle);
             ActivityOptionsCompat options = ActivityOptionsCompat.
-                    makeSceneTransitionAnimation(ComputersActivity.this, item.textItemName, itemValue);
+                    makeSceneTransitionAnimation(ComputersActivity.this, item.textItemName, itemValue.getComputerName());
             startActivity(intent, options.toBundle());
         }
     };

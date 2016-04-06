@@ -152,6 +152,8 @@ public abstract class BaseActivity extends DrawerActivity {
         switch (navigationItem){
             case DEPARTMENTS:
                 if(!(this instanceof DepartmentsActivity)) {
+                    Session.currentDepartment = "";
+                    Session.currentComputer = null;
                     navigateToActivity(DepartmentsActivity.class);
                 }
                 break;

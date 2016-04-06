@@ -27,4 +27,10 @@
     <string name="add_department">Add</string>
     <string name="department">Department</string>
     <string name="users_page_title">Users</string>
+    <string name="computer">Computer</string>
+    <string name="add_computer_page_title">Add Computer</string>
+    <string name="action_add">Add</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="Type">Type</string>
 </resources>

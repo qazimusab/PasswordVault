@@ -55,6 +55,10 @@ public class CredentialsRecyclerViewAdapter extends RecyclerView.Adapter<Credent
         return onItemClickListener;
     }
 
+    public void clear() {
+        credentialList.clear();
+    }
+
     public interface OnItemClickListener{
         void onItemClick(ItemHolder item, int position);
     }

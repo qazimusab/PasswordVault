@@ -17,6 +17,9 @@ public class Credential {
     @SerializedName("Type")
     @Expose
     private String Type;
+    @SerializedName("ComputerId")
+    @Expose
+    private int ComputerId;
 
     /**
      * No args constructor for use in serialization
@@ -41,10 +44,11 @@ public class Credential {
      * @param Password
      * @param UserName
      */
-    public Credential(String UserName, String Password, String Type) {
+    public Credential(String UserName, String Password, String Type, int ComputerId) {
         this.UserName = UserName;
         this.Password = Password;
         this.Type = Type;
+        this.ComputerId = ComputerId;
     }
 
     /**
@@ -99,6 +103,24 @@ public class Credential {
      */
     public void setType(String Type) {
         this.Type = Type;
+    }
+
+    /**
+     *
+     * @return
+     *     The ComputerId
+     */
+    public int getComputerId() {
+        return ComputerId;
+    }
+
+    /**
+     *
+     * @param ComputerId
+     *     The ComputerId
+     */
+    public void setComputerId(int ComputerId) {
+        this.ComputerId = ComputerId;
     }
 
     @Override

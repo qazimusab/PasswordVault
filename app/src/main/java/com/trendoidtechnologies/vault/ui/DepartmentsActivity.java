@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.trendoidtechnologies.vault.R;
 import com.trendoidtechnologies.vault.datacontract.Permission;
 import com.trendoidtechnologies.vault.service.Session;
-import com.trendoidtechnologies.vault.ui.adapter.RecyclerViewAdapter;
+import com.trendoidtechnologies.vault.ui.adapter.DepartmentsRecyclerViewAdapter;
 import com.trendoidtechnologies.vault.ui.widgets.DividerItemDecoration;
 
 public class DepartmentsActivity extends BaseActivity {
@@ -23,13 +23,26 @@ public class DepartmentsActivity extends BaseActivity {
     private CollapsingToolbarLayout collapsingToolbarLayout;
     private RecyclerView departmentsListView;
     private LinearLayoutManager linearLayoutManager;
-    private RecyclerViewAdapter myRecyclerViewAdapter;
-    public static String DEPARTMENT_KEY = "department";
+    private DepartmentsRecyclerViewAdapter myDepartmentsRecyclerViewAdapter;
     private TextView expandedImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        myDepartmentsRecyclerViewAdapter.clear();
+
+        for(Permission permission : Session.user.getPermissions()) {
+
+            myDepartmentsRecyclerViewAdapter.add(permission.getDepartmentName());
+        }
+
+        departmentsListView.setAdapter(myDepartmentsRecyclerViewAdapter);
+        departmentsListView.setItemAnimator(new DefaultItemAnimator());
     }
 
     @Override
@@ -59,17 +72,8 @@ public class DepartmentsActivity extends BaseActivity {
 
         departmentsListView.setHasFixedSize(true);
         departmentsListView.setLayoutManager(linearLayoutManager);
-        myRecyclerViewAdapter = new RecyclerViewAdapter(this);
-        myRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
-
-        for(Permission permission : Session.user.getPermissions()) {
-
-            myRecyclerViewAdapter.add(permission.getDepartmentName());
-        }
-
-        departmentsListView.setAdapter(myRecyclerViewAdapter);
-        departmentsListView.setItemAnimator(new DefaultItemAnimator());
-
+        myDepartmentsRecyclerViewAdapter = new DepartmentsRecyclerViewAdapter(this);
+        myDepartmentsRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
     }
 
     private void setCollapsingToolbarLayoutTitle(String title) {
@@ -80,14 +84,12 @@ public class DepartmentsActivity extends BaseActivity {
         collapsingToolbarLayout.setTitle(title);
     }
 
-    private RecyclerViewAdapter.OnItemClickListener onItemClickListener = new RecyclerViewAdapter.OnItemClickListener() {
+    private DepartmentsRecyclerViewAdapter.OnItemClickListener onItemClickListener = new DepartmentsRecyclerViewAdapter.OnItemClickListener() {
         @Override
-        public void onItemClick(RecyclerViewAdapter.ItemHolder item, int position) {
-            String itemValue = myRecyclerViewAdapter.getItemAtPosition(position);
-            Bundle bundle = new Bundle();
-            bundle.putString(DEPARTMENT_KEY, itemValue);
+        public void onItemClick(DepartmentsRecyclerViewAdapter.ItemHolder item, int position) {
+            String itemValue = myDepartmentsRecyclerViewAdapter.getItemAtPosition(position);
+            Session.currentDepartment = itemValue;
             Intent intent = new Intent(DepartmentsActivity.this, ComputersActivity.class);
-            intent.putExtras(bundle);
             ActivityOptionsCompat options = ActivityOptionsCompat.
                     makeSceneTransitionAnimation(DepartmentsActivity.this, item.textItemName, itemValue);
             startActivity(intent, options.toBundle());

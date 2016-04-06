@@ -57,12 +57,13 @@ public class LoginActivity extends BaseActivity {
 
         mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(signInOnClickListener);
+        mEmailView.setText("johndoe@gmail.com");
+        mPasswordView.setText("Abcd1234/");
     }
 
     View.OnClickListener signInOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View view) {
-
             login();
         }
     };

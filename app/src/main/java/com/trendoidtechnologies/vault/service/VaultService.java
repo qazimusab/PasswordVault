@@ -2,6 +2,8 @@ package com.trendoidtechnologies.vault.service;
 
 import android.content.Context;
 
+import com.trendoidtechnologies.vault.datacontract.Computer;
+import com.trendoidtechnologies.vault.datacontract.Credential;
 import com.trendoidtechnologies.vault.datacontract.Token;
 import com.trendoidtechnologies.vault.datacontract.User;
 
@@ -13,6 +15,7 @@ import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -64,4 +67,11 @@ public interface VaultService {
 
     @GET("/api/AspNetUsers")
     Call<User> getUser(@Header("Authorization") String token, @Query("email") String email);
+
+    @POST("api/Computers")
+    Call<Computer> addComputer(@Header("Authorization") String token, @Body Computer computer);
+
+    @POST("api/Credentials")
+    Call<Credential> addCredential(@Header("Authorization") String token, @Body Credential credential);
+
 }

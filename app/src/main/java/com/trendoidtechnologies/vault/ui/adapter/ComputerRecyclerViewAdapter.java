@@ -13,30 +13,31 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.trendoidtechnologies.vault.R;
+import com.trendoidtechnologies.vault.datacontract.Computer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ItemHolder> {
+public class ComputerRecyclerViewAdapter extends RecyclerView.Adapter<ComputerRecyclerViewAdapter.ItemHolder> {
 
-    private List<String> itemsName;
+    private List<Computer> itemsName;
     private OnItemClickListener onItemClickListener;
     private LayoutInflater layoutInflater;
 
-    public RecyclerViewAdapter(Context context){
+    public ComputerRecyclerViewAdapter(Context context){
         layoutInflater = LayoutInflater.from(context);
         itemsName = new ArrayList<>();
     }
 
     @Override
-    public RecyclerViewAdapter.ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ComputerRecyclerViewAdapter.ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = layoutInflater.inflate(R.layout.layout_item, parent, false);
         return new ItemHolder(itemView, this);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerViewAdapter.ItemHolder holder, int position) {
-        holder.setItemName(itemsName.get(position));
+    public void onBindViewHolder(ComputerRecyclerViewAdapter.ItemHolder holder, int position) {
+        holder.setItemName(itemsName.get(position).getComputerName());
     }
 
     @Override
@@ -56,17 +57,21 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         void onItemClick(ItemHolder item, int position);
     }
 
-    public void add(String iName){
+    public void add(Computer iName){
         itemsName.add(iName);
         notifyItemInserted(itemsName.size() - 1);
     }
 
-    public String getItemAtPosition(int position){
+    public void clear() {
+        itemsName.clear();
+    }
+
+    public Computer getItemAtPosition(int position){
         return itemsName.get(position);
     }
 
-    public void add(int location, String iName){
-        itemsName.add(location, iName);
+    public void add(int location, Computer computer){
+        itemsName.add(location, computer);
         notifyItemInserted(location);
     }
 
@@ -80,10 +85,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public static class ItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        private RecyclerViewAdapter parent;
+        private ComputerRecyclerViewAdapter parent;
         public TextView textItemName;
 
-        public ItemHolder(View itemView, RecyclerViewAdapter parent) {
+        public ItemHolder(View itemView, ComputerRecyclerViewAdapter parent) {
             super(itemView);
             itemView.setOnClickListener(this);
             this.parent = parent;

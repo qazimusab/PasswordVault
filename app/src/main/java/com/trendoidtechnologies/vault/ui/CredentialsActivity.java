@@ -1,12 +1,14 @@
 package com.trendoidtechnologies.vault.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,38 +39,14 @@ public class CredentialsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         expandedImage = (TextView) findViewById(R.id.expandedImage);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            expandedImage.setTransitionName(getExtras().getString(ComputersActivity.COMPUTER_KEY));
+            expandedImage.setTransitionName(Session.currentComputer.getComputerName());
         }
     }
 
     @Override
-    protected void initializeView() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-        computerName = getExtras().getString(ComputersActivity.COMPUTER_KEY);
-        departmentName = getExtras().getString(DepartmentsActivity.DEPARTMENT_KEY);
-
-        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimaryDark));
-        collapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(R.color.white));
-        setCollapsingToolbarLayoutTitle(computerName);
-
-        credentialsListView = (RecyclerView) findViewById(R.id.departments_list);
-        linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        credentialsListView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
-
-        credentialsListView.setHasFixedSize(true);
-        credentialsListView.setLayoutManager(linearLayoutManager);
-        credentialsRecyclerViewAdapter = new CredentialsRecyclerViewAdapter(this);
-        credentialsRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
-
+    protected void onResume() {
+        super.onResume();
+        credentialsRecyclerViewAdapter.clear();
         for(Permission permissions : Session.user.getPermissions()){
             if(permissions.getDepartmentName().equals(departmentName)) {
                 for(Computer computer : permissions.getComputers()){
@@ -83,7 +61,37 @@ public class CredentialsActivity extends BaseActivity {
 
         credentialsListView.setAdapter(credentialsRecyclerViewAdapter);
         credentialsListView.setItemAnimator(new DefaultItemAnimator());
+    }
 
+    @Override
+    protected void initializeView() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(CredentialsActivity.this, AddCredentialActivity.class);
+                ActivityOptionsCompat options = ActivityOptionsCompat.
+                        makeSceneTransitionAnimation(CredentialsActivity.this, expandedImage, "button");
+                startActivity(intent, options.toBundle());
+            }
+        });
+
+        computerName = Session.currentComputer.getComputerName();
+        departmentName = Session.currentDepartment;
+
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimaryDark));
+        collapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(R.color.white));
+        setCollapsingToolbarLayoutTitle(computerName);
+
+        credentialsListView = (RecyclerView) findViewById(R.id.departments_list);
+        linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        credentialsListView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
+
+        credentialsListView.setHasFixedSize(true);
+        credentialsListView.setLayoutManager(linearLayoutManager);
+        credentialsRecyclerViewAdapter = new CredentialsRecyclerViewAdapter(this);
+        credentialsRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
     }
 
     private void setCollapsingToolbarLayoutTitle(String title) {
@@ -91,6 +99,12 @@ public class CredentialsActivity extends BaseActivity {
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
         collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
         collapsingToolbarLayout.setExpandedTitleTypeface(Typeface.DEFAULT_BOLD);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Session.currentComputer = null;
+        super.onBackPressed();
     }
 
     private CredentialsRecyclerViewAdapter.OnItemClickListener onItemClickListener = new CredentialsRecyclerViewAdapter.OnItemClickListener() {
