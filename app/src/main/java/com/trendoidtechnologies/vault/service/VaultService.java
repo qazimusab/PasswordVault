@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.trendoidtechnologies.vault.datacontract.Computer;
 import com.trendoidtechnologies.vault.datacontract.Credential;
+import com.trendoidtechnologies.vault.datacontract.Permission;
 import com.trendoidtechnologies.vault.datacontract.Token;
 import com.trendoidtechnologies.vault.datacontract.User;
 
@@ -21,6 +22,7 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -68,10 +70,19 @@ public interface VaultService {
     @GET("/api/AspNetUsers")
     Call<User> getUser(@Header("Authorization") String token, @Query("email") String email);
 
+    @PUT("/api/AspNetUsers")
+    Call<User> updateUser(@Header("Authorization") String token, @Body User user, @Query("id") String id);
+
     @POST("api/Computers")
     Call<Computer> addComputer(@Header("Authorization") String token, @Body Computer computer);
 
     @POST("api/Credentials")
     Call<Credential> addCredential(@Header("Authorization") String token, @Body Credential credential);
+
+    @POST("api/Departments")
+    Call<Permission> addDepartment(@Header("Authorization") String token, @Body Permission department);
+
+    @POST("api/Account/Register")
+    Call<Void> addUser(@Body User user);
 
 }

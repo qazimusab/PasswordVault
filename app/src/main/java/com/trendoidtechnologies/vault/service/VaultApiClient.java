@@ -4,8 +4,11 @@ import android.content.Context;
 
 import com.trendoidtechnologies.vault.datacontract.Computer;
 import com.trendoidtechnologies.vault.datacontract.Credential;
+import com.trendoidtechnologies.vault.datacontract.Permission;
 import com.trendoidtechnologies.vault.datacontract.Token;
 import com.trendoidtechnologies.vault.datacontract.User;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,6 +58,25 @@ public class VaultApiClient {
         });
     }
 
+    public void addDepartment(Permission department, final OnCallCompleted onCallCompleted) {
+        vaultService.addDepartment("Bearer " + Session.token.getAccessToken(), department).enqueue(new Callback<Permission>() {
+            @Override
+            public void onResponse(Call<Permission> call, Response<Permission> response) {
+                if(response.isSuccessful()){
+                    onCallCompleted.onSuccess();
+                }
+                else {
+                    onCallCompleted.onUnSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Permission> call, Throwable t) {
+                onCallCompleted.onFailure();
+            }
+        });
+    }
+
     public void addCredential(Credential credential, final OnCallCompleted onCallCompleted) {
         vaultService.addCredential("Bearer " + Session.token.getAccessToken(), credential).enqueue(new Callback<Credential>() {
             @Override
@@ -69,6 +91,26 @@ public class VaultApiClient {
 
             @Override
             public void onFailure(Call<Credential> call, Throwable t) {
+                onCallCompleted.onFailure();
+            }
+        });
+    }
+
+    public void addUser(User user, final OnCallCompleted onCallCompleted) {
+        user.setIsAdmin(false);
+        vaultService.addUser(user).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if(response.isSuccessful()){
+                    onCallCompleted.onSuccess();
+                }
+                else {
+                    onCallCompleted.onUnSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
                 onCallCompleted.onFailure();
             }
         });
@@ -90,6 +132,44 @@ public class VaultApiClient {
             @Override
             public void onFailure(Call<User> call, Throwable t) {
                 onUserRefreshed.onFailure();
+            }
+        });
+    }
+
+    public void updateUser(User user, final OnCallCompleted onCallCompleted) {
+        vaultService.updateUser("Bearer " + Session.token.getAccessToken(), user, user.getId()).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if(response.isSuccessful()) {
+                    onCallCompleted.onSuccess();
+                }
+                else {
+                    onCallCompleted.onUnSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                onCallCompleted.onFailure();
+            }
+        });
+    }
+
+    public void getAllUsers(final OnCallCompleted onCallCompleted) {
+        vaultService.getAllUsers("Bearer " + Session.token.getAccessToken()).enqueue(new Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                if(response.isSuccessful()) {
+                    onCallCompleted.onSuccess();
+                }
+                else {
+                    onCallCompleted.onUnSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
+                onCallCompleted.onFailure();
             }
         });
     }

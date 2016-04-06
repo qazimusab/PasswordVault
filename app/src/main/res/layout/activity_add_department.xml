@@ -22,11 +22,14 @@
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/departmentName"
+            android:id="@+id/add_department_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
             android:hint="@string/department"
+            android:imeActionId="@+id/add_department"
+            android:imeActionLabel="@string/action_add"
+            android:imeOptions="actionUnspecified"
             style="@style/EditTextAppTheme"
             android:maxLines="1"
             android:singleLine="true" />
@@ -34,7 +37,7 @@
     </android.support.design.widget.TextInputLayout>
 
     <Button
-        android:id="@+id/fab"
+        android:id="@+id/add_department_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/add_department"
@@ -45,4 +48,12 @@
 </LinearLayout>
 
 
+    <ProgressBar
+        android:id="@+id/add_department_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone" />
 </RelativeLayout>

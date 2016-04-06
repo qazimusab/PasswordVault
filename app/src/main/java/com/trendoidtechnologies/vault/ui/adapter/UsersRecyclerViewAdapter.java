@@ -13,13 +13,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.trendoidtechnologies.vault.R;
+import com.trendoidtechnologies.vault.datacontract.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class UsersRecyclerViewAdapter extends RecyclerView.Adapter<UsersRecyclerViewAdapter.ItemHolder> {
 
-    private List<String> itemsName;
+    private List<User> itemsName;
     private OnItemClickListener onItemClickListener;
     private LayoutInflater layoutInflater;
 
@@ -36,7 +37,7 @@ public class UsersRecyclerViewAdapter extends RecyclerView.Adapter<UsersRecycler
 
     @Override
     public void onBindViewHolder(UsersRecyclerViewAdapter.ItemHolder holder, int position) {
-        holder.setItemName(itemsName.get(position));
+        holder.setItemName(itemsName.get(position).getFirstName() + " " + itemsName.get(position).getLastName());
     }
 
     @Override
@@ -56,17 +57,17 @@ public class UsersRecyclerViewAdapter extends RecyclerView.Adapter<UsersRecycler
         void onItemClick(ItemHolder item, int position);
     }
 
-    public void add(String iName){
-        itemsName.add(iName);
+    public void add(User user){
+        itemsName.add(user);
         notifyItemInserted(itemsName.size() - 1);
     }
 
-    public String getItemAtPosition(int position){
+    public User getUserAtPosition(int position){
         return itemsName.get(position);
     }
 
-    public void add(int location, String iName){
-        itemsName.add(location, iName);
+    public void add(int location, User user){
+        itemsName.add(location, user);
         notifyItemInserted(location);
     }
 

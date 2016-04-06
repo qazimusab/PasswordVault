@@ -19,6 +19,7 @@ import com.trendoidtechnologies.vault.datacontract.User;
 import com.trendoidtechnologies.vault.service.Session;
 import com.trendoidtechnologies.vault.service.VaultService;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import retrofit2.Call;
@@ -57,7 +58,7 @@ public class LoginActivity extends BaseActivity {
 
         mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(signInOnClickListener);
-        mEmailView.setText("johndoe@gmail.com");
+        mEmailView.setText("a@a.a");
         mPasswordView.setText("Abcd1234/");
     }
 
@@ -87,49 +88,83 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void login(){
-        toggleProgress(true);
-        final ActivityOptionsCompat options = ActivityOptionsCompat.
-                makeSceneTransitionAnimation(LoginActivity.this, mEmailSignInButton, "button");
-        VaultService.Factory.getInstance(getApplicationContext()).getAuthToken(mEmailView.getText().toString(), mPasswordView.getText().toString(), "password").enqueue(new Callback<Token>() {
-            @Override
-            public void onResponse(Call<Token> call, Response<Token> response) {
-                if(response.isSuccessful()) {
-                    Session.token = response.body();
-                    VaultService.Factory.getInstance(getApplicationContext()).getUser("Bearer " + Session.token.getAccessToken(), mEmailView.getText().toString()).enqueue(new Callback<User>() {
-                        @Override
-                        public void onResponse(Call<User> call, Response<User> response) {
-                            if(response.isSuccessful()) {
-                                Session.user = response.body();
-                                navigateToActivity(DepartmentsActivity.class, options.toBundle(), true);
-                                finish();
+        if(mEmailView.getText().toString().equals("") || mPasswordView.getText().toString().equals("")){
+            Toast.makeText(getApplicationContext(), "All fields are required.", Toast.LENGTH_LONG).show();
+        }
+        else if(!isEmailValid(mEmailView.getText().toString())){
+            Toast.makeText(getApplicationContext(), "Your email is invalid.", Toast.LENGTH_LONG).show();
+        }
+        else if(!isPasswordValid(mPasswordView.getText().toString())){
+            Toast.makeText(getApplicationContext(), "You email or password is incorrect.", Toast.LENGTH_LONG).show();
+        }
+        else {
+            hideSoftKeyboard();
+            toggleProgress(true);
+            final ActivityOptionsCompat options = ActivityOptionsCompat.
+                    makeSceneTransitionAnimation(LoginActivity.this, mEmailSignInButton, "button");
+            VaultService.Factory.getInstance(getApplicationContext()).getAuthToken(mEmailView.getText().toString(), mPasswordView.getText().toString(), "password").enqueue(new Callback<Token>() {
+                @Override
+                public void onResponse(Call<Token> call, Response<Token> response) {
+                    if (response.isSuccessful()) {
+                        Session.token = response.body();
+                        VaultService.Factory.getInstance(getApplicationContext()).getUser("Bearer " + Session.token.getAccessToken(), mEmailView.getText().toString()).enqueue(new Callback<User>() {
+                            @Override
+                            public void onResponse(Call<User> call, Response<User> response) {
+                                if (response.isSuccessful()) {
+                                    Session.user = response.body();
+                                    if(Session.user.isAdmin()){
+                                        VaultService.Factory.getInstance(getApplicationContext()).getAllUsers("Bearer " + Session.token.getAccessToken()).enqueue(new Callback<List<User>>() {
+                                            @Override
+                                            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                                                if(response.isSuccessful()) {
+                                                    Session.allUsers = response.body();
+                                                    navigateToActivity(DepartmentsActivity.class, options.toBundle(), true);
+                                                    finish();
+                                                }
+                                                else {
+                                                    toggleProgress(false);
+                                                    Toast.makeText(getApplicationContext(), "You were successfully authenticated but then something went wrong. :(", Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<List<User>> call, Throwable t) {
+                                                Toast.makeText(getApplicationContext(), "You were successfully authenticated but then something went wrong. :(", Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        toggleProgress(false);
+                                        navigateToActivity(DepartmentsActivity.class, options.toBundle(), true);
+                                        finish();
+                                    }
+                                } else {
+                                    toggleProgress(false);
+                                    Toast.makeText(getApplicationContext(), "You were successfully authenticated but then something went wrong. :(", Toast.LENGTH_LONG).show();
+                                }
                             }
-                            else {
+
+                            @Override
+                            public void onFailure(Call<User> call, Throwable t) {
                                 toggleProgress(false);
-                                Toast.makeText(getApplicationContext(), "You were successfully authenticated by then something went wrong. :(", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "You were successfully authenticated but then something went wrong. :(", Toast.LENGTH_LONG).show();
                             }
-                        }
-
-                        @Override
-                        public void onFailure(Call<User> call, Throwable t) {
-                            toggleProgress(false);
-                            Toast.makeText(getApplicationContext(), "You were successfully authenticated by then something went wrong. :(", Toast.LENGTH_LONG).show();
-                        }
-                    });
+                        });
+                    } else {
+                        toggleProgress(false);
+                        Session.clearSession();
+                        Toast.makeText(getApplicationContext(), "You email or password is incorrect.", Toast.LENGTH_LONG).show();
+                    }
                 }
-                else {
+
+                @Override
+                public void onFailure(Call<Token> call, Throwable t) {
                     toggleProgress(false);
-                    Session.clearSession(); 
-                    Toast.makeText(getApplicationContext(), "You username or password is incorrect.", Toast.LENGTH_LONG).show();
+                    Session.clearSession();
+                    Toast.makeText(getApplicationContext(), "You email or password is incorrect.", Toast.LENGTH_LONG).show();
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Token> call, Throwable t) {
-                toggleProgress(false);
-                Session.clearSession();
-                Toast.makeText(getApplicationContext(), "You username or password is incorrect.", Toast.LENGTH_LONG).show();
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -180,15 +215,19 @@ public class LoginActivity extends BaseActivity {
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
+        return email.contains("@") && email.contains(".");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        String special = "!@#$%^&*()_";
-        String pattern = ".*[" + Pattern.quote(special) + "].*";
-        return password.length() > 7 && password.matches(pattern) && !password.equals(password.toLowerCase());
+        return password.length() > 7 && !isAlphaNumeric(password) && !password.equals(password.toLowerCase());
+    }
+    
+    private boolean isAlphaNumeric(String s){
+        String pattern= "^[a-zA-Z0-9]*$";
+        if(s.matches(pattern)){
+            return true;
+        }
+        return false;
     }
 }
 

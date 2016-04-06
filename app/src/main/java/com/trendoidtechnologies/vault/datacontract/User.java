@@ -18,7 +18,10 @@ public class User {
     private String LastName;
     @SerializedName("Password")
     @Expose
-    private Object Password;
+    private String Password;
+    @SerializedName("ConfirmPassword")
+    @Expose
+    private String ConfirmPassword;
     @SerializedName("Email")
     @Expose
     private String Email;
@@ -49,10 +52,31 @@ public class User {
      * @param LastName
      * @param Permissions
      */
-    public User(String FirstName, String LastName, Object Password, String Email, String Id, boolean IsAdmin, List<Permission> Permissions) {
+    public User(String FirstName, String LastName, String Password, String Email, String Id, boolean IsAdmin, List<Permission> Permissions) {
         this.FirstName = FirstName;
         this.LastName = LastName;
         this.Password = Password;
+        this.Email = Email;
+        this.Id = Id;
+        this.IsAdmin = IsAdmin;
+        this.Permissions = Permissions;
+    }
+
+    /**
+     *
+     * @param Email
+     * @param Password
+     * @param FirstName
+     * @param Id
+     * @param IsAdmin
+     * @param LastName
+     * @param Permissions
+     */
+    public User(String FirstName, String LastName, String Password, String ConfirmPassword, String Email, String Id, boolean IsAdmin, List<Permission> Permissions) {
+        this.FirstName = FirstName;
+        this.LastName = LastName;
+        this.Password = Password;
+        this.ConfirmPassword = ConfirmPassword;
         this.Email = Email;
         this.Id = Id;
         this.IsAdmin = IsAdmin;
@@ -100,7 +124,7 @@ public class User {
      * @return
      *     The Password
      */
-    public Object getPassword() {
+    public String getPassword() {
         return Password;
     }
 
@@ -109,8 +133,26 @@ public class User {
      * @param Password
      *     The Password
      */
-    public void setPassword(Object Password) {
+    public void setPassword(String Password) {
         this.Password = Password;
+    }
+
+    /**
+     *
+     * @return
+     *     The ConfirmPassword
+     */
+    public String getConfirmPassword() {
+        return ConfirmPassword;
+    }
+
+    /**
+     *
+     * @param ConfirmPassword
+     *     The ConfirmPassword
+     */
+    public void setConfirmPassword(String ConfirmPassword) {
+        this.ConfirmPassword = ConfirmPassword;
     }
 
     /**

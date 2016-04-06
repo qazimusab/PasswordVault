@@ -92,7 +92,6 @@
         android:text="@string/action_sign_in"
         android:transitionName="button"/>
 
-    <!-- Login progress -->
     <ProgressBar
         android:id="@+id/login_progress"
         style="?android:attr/progressBarStyleLarge"

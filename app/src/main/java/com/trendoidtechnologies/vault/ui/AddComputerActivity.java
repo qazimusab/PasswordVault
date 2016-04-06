@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ public class AddComputerActivity extends BaseActivity {
 
     private EditText mComputerEt;
     private Button mAddComputerBtn;
+    private ProgressBar mProgress;
 
     @Override
     protected void initializeView() {
@@ -24,8 +26,9 @@ public class AddComputerActivity extends BaseActivity {
 
         mComputerEt = (EditText) findViewById(R.id.add_computer_computer_name);
         mAddComputerBtn = (Button) findViewById(R.id.add_computer_btn);
+        mProgress = (ProgressBar) findViewById(R.id.add_computer_progress);
 
-        mAddComputerBtn.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mComputerEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.add_computer || id == EditorInfo.IME_NULL) {
@@ -47,42 +50,58 @@ public class AddComputerActivity extends BaseActivity {
     };
 
     private void addComputer() {
-        Computer computerToAdd = new Computer();
-        computerToAdd.setComputerName(mComputerEt.getText().toString());
-        computerToAdd.setDepartmentName(Session.currentDepartment);
-        vaultApiClient.addComputer(computerToAdd, new VaultApiClient.OnCallCompleted() {
-            @Override
-            public void onSuccess() {
-                vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
-                    @Override
-                    public void onSuccess() {
-                        Toast.makeText(getApplicationContext(), "Your computer was added successfully!", Toast.LENGTH_LONG).show();
-                        onBackPressed();
-                    }
+        if(mComputerEt.getText().toString().equals("")){
+            Toast.makeText(getApplicationContext(), "All fields are required", Toast.LENGTH_LONG).show();
+        }
+        else {
+            hideSoftKeyboard();
+            toggleProgress(true);
+            Computer computerToAdd = new Computer();
+            computerToAdd.setComputerName(mComputerEt.getText().toString());
+            computerToAdd.setDepartmentName(Session.currentDepartment);
+            vaultApiClient.addComputer(computerToAdd, new VaultApiClient.OnCallCompleted() {
+                @Override
+                public void onSuccess() {
+                    vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
+                        @Override
+                        public void onSuccess() {
+                            toggleProgress(false);
+                            Toast.makeText(getApplicationContext(), "Your computer was added successfully!", Toast.LENGTH_LONG).show();
+                            onBackPressed();
+                        }
 
-                    @Override
-                    public void onUnSuccess() {
+                        @Override
+                        public void onUnSuccess() {
+                            toggleProgress(false);
+                        }
 
-                    }
+                        @Override
+                        public void onFailure() {
+                            toggleProgress(false);
+                        }
+                    });
+                }
 
-                    @Override
-                    public void onFailure() {
+                @Override
+                public void onUnSuccess() {
+                    toggleProgress(false);
+                    Toast.makeText(getApplicationContext(), "There was an error adding your computer.", Toast.LENGTH_LONG).show();
+                }
 
-                    }
-                });
-            }
+                @Override
+                public void onFailure() {
+                    toggleProgress(false);
+                    Toast.makeText(getApplicationContext(), "Something went wrong :(", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
 
-            @Override
-            public void onUnSuccess() {
-                Toast.makeText(getApplicationContext(), "There was an error adding your computer.", Toast.LENGTH_LONG).show();
-            }
 
-            @Override
-            public void onFailure() {
-                Toast.makeText(getApplicationContext(), "Something went wrong :(", Toast.LENGTH_LONG).show();
-            }
-        });
-
+    public void toggleProgress(boolean isLoading) {
+        mAddComputerBtn.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        mComputerEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        mProgress.setVisibility(isLoading ? View.VISIBLE : View.GONE);
     }
 
     @Override

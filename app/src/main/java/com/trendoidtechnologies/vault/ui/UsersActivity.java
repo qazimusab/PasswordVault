@@ -1,9 +1,11 @@
 package com.trendoidtechnologies.vault.ui;
 
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +13,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.trendoidtechnologies.vault.R;
+import com.trendoidtechnologies.vault.datacontract.User;
+import com.trendoidtechnologies.vault.service.Session;
 import com.trendoidtechnologies.vault.ui.adapter.UsersRecyclerViewAdapter;
 import com.trendoidtechnologies.vault.ui.widgets.DividerItemDecoration;
 
@@ -20,7 +24,6 @@ public class UsersActivity extends BaseActivity {
     private RecyclerView departmentsListView;
     private LinearLayoutManager linearLayoutManager;
     private UsersRecyclerViewAdapter myRecyclerViewAdapter;
-    public static String USER_KEY = "user";
     private TextView expandedImage;
 
     @Override
@@ -35,10 +38,10 @@ public class UsersActivity extends BaseActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(UsersActivity.this, AddDepartmentActivity.class);
-//                ActivityOptionsCompat options = ActivityOptionsCompat.
-//                        makeSceneTransitionAnimation(UsersActivity.this, expandedImage, "button");
-//                startActivity(intent, options.toBundle());
+                Intent intent = new Intent(UsersActivity.this, AddUserActivity.class);
+                ActivityOptionsCompat options = ActivityOptionsCompat.
+                        makeSceneTransitionAnimation(UsersActivity.this, expandedImage, "button");
+                startActivity(intent, options.toBundle());
             }
         });
 
@@ -55,12 +58,9 @@ public class UsersActivity extends BaseActivity {
         myRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
 
 
-        myRecyclerViewAdapter.add("Bob");
-        myRecyclerViewAdapter.add("Jackson");
-        myRecyclerViewAdapter.add("Samantha");
-        myRecyclerViewAdapter.add("Kelly");
-        myRecyclerViewAdapter.add("Curtis");
-        myRecyclerViewAdapter.add("Kareem");
+        for(User user : Session.allUsers) {
+            myRecyclerViewAdapter.add(user);
+        }
 
         departmentsListView.setAdapter(myRecyclerViewAdapter);
         departmentsListView.setItemAnimator(new DefaultItemAnimator());
@@ -78,22 +78,8 @@ public class UsersActivity extends BaseActivity {
     private UsersRecyclerViewAdapter.OnItemClickListener onItemClickListener = new UsersRecyclerViewAdapter.OnItemClickListener() {
         @Override
         public void onItemClick(UsersRecyclerViewAdapter.ItemHolder item, int position) {
-            int itemPosition = position;
-
-
-            String itemValue = myRecyclerViewAdapter.getItemAtPosition(position);
-
-            // Show Alert
-//            Toast.makeText(getApplicationContext(),
-//                    "Position :"+itemPosition+"  ListItem : " + itemValue , Toast.LENGTH_LONG)
-//                    .show();
-//            Bundle bundle = new Bundle();
-//            bundle.putString(USER_KEY, itemValue);
-//            Intent intent = new Intent(UsersActivity.this, ComputersActivity.class);
-//            intent.putExtras(bundle);
-//            ActivityOptionsCompat options = ActivityOptionsCompat.
-//                    makeSceneTransitionAnimation(UsersActivity.this, item.textItemName, itemValue);
-//            startActivity(intent, options.toBundle());
+            User itemValue = myRecyclerViewAdapter.getUserAtPosition(position);
+            Session.currentUser = itemValue;
         }
     };
 
