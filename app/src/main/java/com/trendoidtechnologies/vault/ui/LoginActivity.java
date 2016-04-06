@@ -1,13 +1,11 @@
 package com.trendoidtechnologies.vault.ui;
 
-import android.content.Intent;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -89,9 +87,6 @@ public class LoginActivity extends BaseActivity {
 
     private void login(){
         toggleProgress(true);
-        final Intent intent = new Intent(LoginActivity.this, DepartmentsActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         final ActivityOptionsCompat options = ActivityOptionsCompat.
                 makeSceneTransitionAnimation(LoginActivity.this, mEmailSignInButton, "button");
         VaultService.Factory.getInstance(getApplicationContext()).getAuthToken(mEmailView.getText().toString(), mPasswordView.getText().toString(), "password").enqueue(new Callback<Token>() {
@@ -104,7 +99,7 @@ public class LoginActivity extends BaseActivity {
                         public void onResponse(Call<User> call, Response<User> response) {
                             if(response.isSuccessful()) {
                                 Session.user = response.body();
-                                startActivity(intent, options.toBundle());
+                                navigateToActivity(DepartmentsActivity.class, options.toBundle(), true);
                                 finish();
                             }
                             else {

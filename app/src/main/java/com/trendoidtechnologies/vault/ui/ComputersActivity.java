@@ -96,16 +96,7 @@ public class ComputersActivity extends BaseActivity {
     private RecyclerViewAdapter.OnItemClickListener onItemClickListener = new RecyclerViewAdapter.OnItemClickListener() {
         @Override
         public void onItemClick(RecyclerViewAdapter.ItemHolder item, int position) {
-
-            int itemPosition = position;
-
-
             String itemValue = myRecyclerViewAdapter.getItemAtPosition(position);
-
-            // Show Alert
-//            Toast.makeText(getApplicationContext(),
-//                    "Position :"+itemPosition+"  ListItem : " +itemValue , Toast.LENGTH_LONG)
-//                    .show();
             Bundle bundle = new Bundle();
             bundle.putString(COMPUTER_KEY, itemValue);
             bundle.putString(DepartmentsActivity.DEPARTMENT_KEY, department);

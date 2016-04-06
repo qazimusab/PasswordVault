@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
-import android.widget.Toast;
 
 import com.trendoidtechnologies.vault.R;
 import com.trendoidtechnologies.vault.service.Session;
@@ -85,7 +84,6 @@ public abstract class BaseActivity extends DrawerActivity {
                 @Override
                 public void onClick(DrawerItem item, long id, int position) {
                     selectItem(position);
-                    Toast.makeText(BaseActivity.this, "Clicked item #" + position, Toast.LENGTH_SHORT).show();
                     switch (position) {
                         case 0:
                             navigateToItem(NavigationItem.DEPARTMENTS);
@@ -128,7 +126,6 @@ public abstract class BaseActivity extends DrawerActivity {
                 @Override
                 public void onClick(DrawerItem item, long id, int position) {
                     selectItem(position);
-                    Toast.makeText(BaseActivity.this, "Clicked item #" + position, Toast.LENGTH_SHORT).show();
                     switch (position) {
                         case 0:
                             navigateToItem(NavigationItem.DEPARTMENTS);
@@ -154,13 +151,17 @@ public abstract class BaseActivity extends DrawerActivity {
         closeDrawer();
         switch (navigationItem){
             case DEPARTMENTS:
-                navigateToActivity(DepartmentsActivity.class);
+                if(!(this instanceof DepartmentsActivity)) {
+                    navigateToActivity(DepartmentsActivity.class);
+                }
                 break;
             case USERS:
-                navigateToActivity(UsersActivity.class);
+                if(!(this instanceof UsersActivity)) {
+                    navigateToActivity(UsersActivity.class);
+                }
                 break;
             case LOGOUT:
-                Session.clearSession();
+//                Session.clearSession();
                 navigateToActivity(LoginActivity.class);
                 break;
         }
@@ -189,6 +190,16 @@ public abstract class BaseActivity extends DrawerActivity {
 
     protected void navigateToActivity(Class activity, Bundle extraBundle) {
         Intent intent = new Intent(this, activity);
+        intent.putExtras(extraBundle);
+        startActivity(intent);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+    }
+
+    protected void navigateToActivity(Class activity, Bundle extraBundle, boolean clearTop) {
+        Intent intent = new Intent(this, activity);
+        if (clearTop) {
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
         intent.putExtras(extraBundle);
         startActivity(intent);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
