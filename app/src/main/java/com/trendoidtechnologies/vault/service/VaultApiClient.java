@@ -175,6 +175,25 @@ public class VaultApiClient {
         });
     }
 
+    public void deleteDepartment(String departmentName, final OnCallCompleted onCallCompleted) {
+        vaultService.deleteDepartment("Bearer " + Session.token.getAccessToken(), departmentName).enqueue(new Callback<Permission>() {
+            @Override
+            public void onResponse(Call<Permission> call, Response<Permission> response) {
+                if(response.isSuccessful()) {
+                    onCallCompleted.onSuccess();
+                }
+                else {
+                    onCallCompleted.onUnSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Permission> call, Throwable t) {
+                onCallCompleted.onFailure();
+            }
+        });
+    }
+
     public interface OnCallCompleted {
         void onSuccess();
         void onUnSuccess();

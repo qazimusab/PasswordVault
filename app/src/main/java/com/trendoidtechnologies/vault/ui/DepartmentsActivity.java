@@ -10,8 +10,10 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.trendoidtechnologies.vault.R;
 import com.trendoidtechnologies.vault.datacontract.Permission;
@@ -30,6 +32,7 @@ public class DepartmentsActivity extends BaseActivity {
     private TextView expandedImage;
     private SwipeRefreshLayout swipeRefreshLayout;
     private MyAppBarLayout myAppBarLayout;
+    private ItemTouchHelper itemTouchHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,9 +114,59 @@ public class DepartmentsActivity extends BaseActivity {
         setCollapsingToolbarLayoutTitle(getString(R.string.departments_page_title));
 
         departmentsListView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
-
         departmentsListView.setHasFixedSize(true);
         departmentsListView.setLayoutManager(linearLayoutManager);
+
+        final ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                swipeRefreshLayout.setRefreshing(true);
+                String departmentSwiped = myDepartmentsRecyclerViewAdapter.getItemAtPosition(viewHolder.getAdapterPosition());
+                vaultApiClient.deleteDepartment(departmentSwiped, new VaultApiClient.OnCallCompleted() {
+                    @Override
+                    public void onSuccess() {
+                        vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
+                            @Override
+                            public void onSuccess() {
+                                refreshPage();
+                                swipeRefreshLayout.setRefreshing(false);
+                                Toast.makeText(getApplicationContext(), "The department was successfully deleted", Toast.LENGTH_LONG).show();
+                            }
+
+                            @Override
+                            public void onUnSuccess() {
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onUnSuccess() {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
+
+            }
+        };
+
+        itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(departmentsListView);
         myDepartmentsRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
     }
 

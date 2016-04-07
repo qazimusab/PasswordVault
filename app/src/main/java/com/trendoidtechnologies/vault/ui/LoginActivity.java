@@ -20,7 +20,6 @@ import com.trendoidtechnologies.vault.service.Session;
 import com.trendoidtechnologies.vault.service.VaultService;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit2.Callback;
