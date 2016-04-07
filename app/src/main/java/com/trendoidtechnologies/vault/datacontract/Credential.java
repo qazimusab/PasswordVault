@@ -20,6 +20,9 @@ public class Credential {
     @SerializedName("ComputerId")
     @Expose
     private int ComputerId;
+    @SerializedName("Id")
+    @Expose
+    private int Id;
 
     /**
      * No args constructor for use in serialization
@@ -121,6 +124,24 @@ public class Credential {
      */
     public void setComputerId(int ComputerId) {
         this.ComputerId = ComputerId;
+    }
+
+    /**
+     *
+     * @return
+     *     The Id
+     */
+    public int getId() {
+        return Id;
+    }
+
+    /**
+     *
+     * @param Id
+     *     The Id
+     */
+    public void setId(int Id) {
+        this.Id = Id;
     }
 
     @Override

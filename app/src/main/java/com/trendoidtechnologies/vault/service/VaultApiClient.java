@@ -194,6 +194,63 @@ public class VaultApiClient {
         });
     }
 
+    public void deleteComputer(int computerId, final OnCallCompleted onCallCompleted) {
+        vaultService.deleteComputer("Bearer " + Session.token.getAccessToken(), computerId).enqueue(new Callback<Computer>() {
+            @Override
+            public void onResponse(Call<Computer> call, Response<Computer> response) {
+                if(response.isSuccessful()){
+                    onCallCompleted.onSuccess();
+                }
+                else {
+                    onCallCompleted.onUnSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Computer> call, Throwable t) {
+                onCallCompleted.onFailure();
+            }
+        });
+    }
+
+    public void deleteCredential(int credentialId, final OnCallCompleted onCallCompleted) {
+        vaultService.deleteCredential("Bearer " + Session.token.getAccessToken(), credentialId).enqueue(new Callback<Credential>() {
+            @Override
+            public void onResponse(Call<Credential> call, Response<Credential> response) {
+                if(response.isSuccessful()){
+                    onCallCompleted.onSuccess();
+                }
+                else {
+                    onCallCompleted.onUnSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Credential> call, Throwable t) {
+                onCallCompleted.onFailure();
+            }
+        });
+    }
+
+    public void deleteUser(String userId, final OnCallCompleted onCallCompleted) {
+        vaultService.deleteUser("Bearer " + Session.token.getAccessToken(), userId).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if(response.isSuccessful()){
+                    onCallCompleted.onSuccess();
+                }
+                else {
+                    onCallCompleted.onUnSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                onCallCompleted.onFailure();
+            }
+        });
+    }
+
     public interface OnCallCompleted {
         void onSuccess();
         void onUnSuccess();

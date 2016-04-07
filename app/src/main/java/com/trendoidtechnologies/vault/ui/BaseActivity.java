@@ -153,7 +153,7 @@ public abstract class BaseActivity extends DrawerActivity {
                 }
                 break;
             case LOGOUT:
-//                Session.clearSession();
+                Session.clearSession();
                 navigateToActivity(LoginActivity.class);
                 break;
         }

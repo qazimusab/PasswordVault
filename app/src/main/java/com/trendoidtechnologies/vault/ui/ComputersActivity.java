@@ -12,9 +12,11 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.trendoidtechnologies.vault.R;
 import com.trendoidtechnologies.vault.datacontract.Computer;
@@ -35,6 +37,7 @@ public class ComputersActivity extends BaseActivity {
     private TextView expandedImage;
     private MyAppBarLayout myAppBarLayout;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ItemTouchHelper itemTouchHelper;
 
 
     @Override
@@ -116,6 +119,57 @@ public class ComputersActivity extends BaseActivity {
         computersListView.setLayoutManager(linearLayoutManager);
         computerRecyclerViewAdapter = new ComputerRecyclerViewAdapter(this);
         computerRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
+
+        final ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                swipeRefreshLayout.setRefreshing(true);
+                Computer computerSwiped = computerRecyclerViewAdapter.getItemAtPosition(viewHolder.getAdapterPosition());
+                vaultApiClient.deleteComputer(computerSwiped.getComputerId(), new VaultApiClient.OnCallCompleted() {
+                    @Override
+                    public void onSuccess() {
+                        vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
+                            @Override
+                            public void onSuccess() {
+                                refreshPage();
+                                swipeRefreshLayout.setRefreshing(false);
+                                Toast.makeText(getApplicationContext(), "The computer was successfully deleted", Toast.LENGTH_LONG).show();
+                            }
+
+                            @Override
+                            public void onUnSuccess() {
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onUnSuccess() {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
+
+            }
+        };
+
+        itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(computersListView);
 
     }
 

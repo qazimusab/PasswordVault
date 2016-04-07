@@ -88,4 +88,13 @@ public interface VaultService {
 
     @DELETE("api/Departments")
     Call<Permission> deleteDepartment(@Header("Authorization") String token, @Query("name") String departmentName);
+
+    @DELETE("api/Computers/{id}")
+    Call<Computer> deleteComputer(@Header("Authorization") String token, @Path("id") int computerId);
+
+    @DELETE("api/Credentials/{id}")
+    Call<Credential> deleteCredential(@Header("Authorization") String token, @Path("id") int credentialId);
+
+    @DELETE("api/AspNetUsers/{id}")
+    Call<User> deleteUser(@Header("Authorization") String token, @Path("id") String userId);
 }
