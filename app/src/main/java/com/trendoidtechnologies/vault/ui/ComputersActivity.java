@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,8 +20,10 @@ import com.trendoidtechnologies.vault.R;
 import com.trendoidtechnologies.vault.datacontract.Computer;
 import com.trendoidtechnologies.vault.datacontract.Permission;
 import com.trendoidtechnologies.vault.service.Session;
+import com.trendoidtechnologies.vault.service.VaultApiClient;
 import com.trendoidtechnologies.vault.ui.adapter.ComputerRecyclerViewAdapter;
 import com.trendoidtechnologies.vault.ui.widgets.DividerItemDecoration;
+import com.trendoidtechnologies.vault.ui.widgets.MyAppBarLayout;
 
 public class ComputersActivity extends BaseActivity {
 
@@ -30,6 +33,8 @@ public class ComputersActivity extends BaseActivity {
     private LinearLayoutManager linearLayoutManager;
     private ComputerRecyclerViewAdapter computerRecyclerViewAdapter;
     private TextView expandedImage;
+    private MyAppBarLayout myAppBarLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     @Override
@@ -42,6 +47,7 @@ public class ComputersActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         expandedImage = (TextView) findViewById(R.id.expandedImage);
+        expandedImage.setBackground(Session.getListViewHeader());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             expandedImage.setTransitionName(Session.currentDepartment);
         }
@@ -50,21 +56,15 @@ public class ComputersActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        computerRecyclerViewAdapter.clear();
-        for(Permission permissions : Session.user.getPermissions()){
-            if(permissions.getDepartmentName().equals(department)) {
-                for(Computer computer : permissions.getComputers()){
-                    computerRecyclerViewAdapter.add(computer);
-                }
-            }
-        }
-        computersListView.setAdapter(computerRecyclerViewAdapter);
-        computersListView.setItemAnimator(new DefaultItemAnimator());
+        refreshPage();
     }
 
     @Override
     protected void initializeView() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        myAppBarLayout = (MyAppBarLayout) findViewById(R.id.app_bar_layout);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_computers_swipe_to_refresh_layout);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -72,6 +72,32 @@ public class ComputersActivity extends BaseActivity {
                 ActivityOptionsCompat options = ActivityOptionsCompat.
                         makeSceneTransitionAnimation(ComputersActivity.this, expandedImage, "button");
                 startActivity(intent, options.toBundle());
+            }
+        });
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
+                    @Override
+                    public void onSuccess() {
+                        refreshPage();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onUnSuccess() {
+                        refreshPage();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        refreshPage();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
             }
         });
 
@@ -91,6 +117,29 @@ public class ComputersActivity extends BaseActivity {
         computerRecyclerViewAdapter = new ComputerRecyclerViewAdapter(this);
         computerRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
 
+    }
+
+    private void refreshPage() {
+        computerRecyclerViewAdapter.clear();
+        for(Permission permissions : Session.user.getPermissions()){
+            if(permissions.getDepartmentName().equals(department)) {
+                for(Computer computer : permissions.getComputers()){
+                    computerRecyclerViewAdapter.add(computer);
+                }
+            }
+        }
+        computersListView.setAdapter(computerRecyclerViewAdapter);
+        computersListView.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        swipeRefreshLayout.setEnabled(false);
+
+        if(myAppBarLayout.state == MyAppBarLayout.State.EXPANDED){
+            swipeRefreshLayout.setEnabled(true);
+        }
     }
 
     private void setCollapsingToolbarLayoutTitle(String title) {

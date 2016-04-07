@@ -45,6 +45,7 @@ public class LoginActivity extends BaseActivity {
         mProgressView = (ProgressBar)findViewById(R.id.login_progress);
         linearLayout = (LinearLayout) findViewById(R.id.linearLayoutLoginContainer);
         mPasswordView = (EditText) findViewById(R.id.password);
+        Session.cacheAssets(getApplicationContext());
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {

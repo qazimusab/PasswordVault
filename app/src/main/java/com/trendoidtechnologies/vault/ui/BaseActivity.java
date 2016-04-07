@@ -2,7 +2,6 @@ package com.trendoidtechnologies.vault.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
@@ -36,7 +35,8 @@ public abstract class BaseActivity extends DrawerActivity {
     private Bundle extras;
     protected Toolbar toolbar;
     private List<DrawerItem> navigationItems;
-    public enum NavigationItem{
+
+    public enum NavigationItem {
         DEPARTMENTS,
         USERS,
         LOGOUT
@@ -54,17 +54,16 @@ public abstract class BaseActivity extends DrawerActivity {
         onViewCreated();
     }
 
-    protected void onViewCreated(){
-        if(this instanceof LoginActivity) {
+    protected void onViewCreated() {
+        if (this instanceof LoginActivity) {
 
-        }
-        else {
+        } else {
             setDrawer();
         }
     }
 
     protected void setDrawer() {
-        if(Session.user.isAdmin()) {
+        if (Session.user.isAdmin()) {
             navigationItems = new ArrayList<>();
             navigationItems.add(new DrawerItem()
                     .setTextPrimary(getString(R.string.navigation_item_my_departments))
@@ -101,15 +100,8 @@ public abstract class BaseActivity extends DrawerActivity {
                 }
             });
 
-            addProfile(new DrawerProfile()
-                    .setId(1)
-                    .setRoundedAvatar((BitmapDrawable) getResources().getDrawable(R.drawable.profile_avatar))
-                    .setBackground(ContextCompat.getDrawable(this, R.drawable.nav_drawer_header2))
-                    .setName(Session.user.getFirstName() + " " + Session.user.getLastName())
-                    .setDescription("Administrator")
-            );
-        }
-        else {
+            addProfile(Session.getDrawerProfileInstance(true));
+        } else {
             navigationItems = new ArrayList<>();
             navigationItems.add(new DrawerItem()
                     .setTextPrimary(getString(R.string.navigation_item_my_departments))
@@ -140,28 +132,23 @@ public abstract class BaseActivity extends DrawerActivity {
                 }
             });
 
-            addProfile(new DrawerProfile()
-                    .setId(1)
-                    .setRoundedAvatar((BitmapDrawable) getResources().getDrawable(R.drawable.profile_avatar))
-                    .setBackground(ContextCompat.getDrawable(this, R.drawable.nav_drawer_header2))
-                    .setName(Session.user.getFirstName() + " " + Session.user.getLastName())
-                    .setDescription("User")
-            );
+            addProfile(Session.getDrawerProfileInstance(false));
         }
+
     }
 
-    protected void navigateToItem(NavigationItem navigationItem){
+    protected void navigateToItem(NavigationItem navigationItem) {
         closeDrawer();
-        switch (navigationItem){
+        switch (navigationItem) {
             case DEPARTMENTS:
-                if(!(this instanceof DepartmentsActivity)) {
+                if (!(this instanceof DepartmentsActivity)) {
                     Session.currentDepartment = "";
                     Session.currentComputer = null;
                     navigateToActivity(DepartmentsActivity.class);
                 }
                 break;
             case USERS:
-                if(!(this instanceof UsersActivity)) {
+                if (!(this instanceof UsersActivity)) {
                     navigateToActivity(UsersActivity.class);
                 }
                 break;
@@ -172,13 +159,14 @@ public abstract class BaseActivity extends DrawerActivity {
         }
     }
 
-    protected boolean isNavDrawerEnabled(){
+    protected boolean isNavDrawerEnabled() {
         return true;
     }
 
     protected abstract void initializeView();
 
-    protected abstract @LayoutRes
+    protected abstract
+    @LayoutRes
     int activityToInflate();
 
     @Override
@@ -219,8 +207,7 @@ public abstract class BaseActivity extends DrawerActivity {
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
-    public Bundle getExtras()
-    {
+    public Bundle getExtras() {
         return extras;
     }
 
@@ -241,7 +228,7 @@ public abstract class BaseActivity extends DrawerActivity {
                                    @Nullable String backStackStateName) {
         getSupportFragmentManager()
                 .beginTransaction()
-                        .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
+                .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
                 .replace(containerViewId, fragment, fragmentTag)
                 .addToBackStack(backStackStateName)
                 .commit();
@@ -250,7 +237,7 @@ public abstract class BaseActivity extends DrawerActivity {
     public void hideSoftKeyboard() {
         View view = this.getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }

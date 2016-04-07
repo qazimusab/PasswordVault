@@ -9,6 +9,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,8 +22,10 @@ import com.trendoidtechnologies.vault.datacontract.Credential;
 import com.trendoidtechnologies.vault.R;
 import com.trendoidtechnologies.vault.datacontract.Permission;
 import com.trendoidtechnologies.vault.service.Session;
+import com.trendoidtechnologies.vault.service.VaultApiClient;
 import com.trendoidtechnologies.vault.ui.adapter.CredentialsRecyclerViewAdapter;
 import com.trendoidtechnologies.vault.ui.widgets.DividerItemDecoration;
+import com.trendoidtechnologies.vault.ui.widgets.MyAppBarLayout;
 
 public class CredentialsActivity extends BaseActivity {
 
@@ -33,11 +36,14 @@ public class CredentialsActivity extends BaseActivity {
     private LinearLayoutManager linearLayoutManager;
     private CredentialsRecyclerViewAdapter credentialsRecyclerViewAdapter;
     private TextView expandedImage;
+    private MyAppBarLayout myAppBarLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         expandedImage = (TextView) findViewById(R.id.expandedImage);
+        expandedImage.setBackground(Session.getListViewHeader());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             expandedImage.setTransitionName(Session.currentComputer.getComputerName());
         }
@@ -46,6 +52,10 @@ public class CredentialsActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        refreshPage();
+    }
+
+    private void refreshPage() {
         credentialsRecyclerViewAdapter.clear();
         for(Permission permissions : Session.user.getPermissions()){
             if(permissions.getDepartmentName().equals(departmentName)) {
@@ -65,6 +75,8 @@ public class CredentialsActivity extends BaseActivity {
 
     @Override
     protected void initializeView() {
+        myAppBarLayout = (MyAppBarLayout) findViewById(R.id.app_bar_layout);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_credentials_swipe_to_refresh_layout);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +85,33 @@ public class CredentialsActivity extends BaseActivity {
                 ActivityOptionsCompat options = ActivityOptionsCompat.
                         makeSceneTransitionAnimation(CredentialsActivity.this, expandedImage, "button");
                 startActivity(intent, options.toBundle());
+            }
+        });
+
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
+                    @Override
+                    public void onSuccess() {
+                        refreshPage();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onUnSuccess() {
+                        refreshPage();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        refreshPage();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
             }
         });
 
@@ -121,6 +160,16 @@ public class CredentialsActivity extends BaseActivity {
 //                    .show();
         }
     };
+
+    @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        swipeRefreshLayout.setEnabled(false);
+
+        if(myAppBarLayout.state == MyAppBarLayout.State.EXPANDED){
+            swipeRefreshLayout.setEnabled(true);
+        }
+    }
 
     @Override
     protected int activityToInflate() {

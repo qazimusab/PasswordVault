@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,8 +16,10 @@ import android.widget.TextView;
 import com.trendoidtechnologies.vault.R;
 import com.trendoidtechnologies.vault.datacontract.Permission;
 import com.trendoidtechnologies.vault.service.Session;
+import com.trendoidtechnologies.vault.service.VaultApiClient;
 import com.trendoidtechnologies.vault.ui.adapter.DepartmentsRecyclerViewAdapter;
 import com.trendoidtechnologies.vault.ui.widgets.DividerItemDecoration;
+import com.trendoidtechnologies.vault.ui.widgets.MyAppBarLayout;
 
 public class DepartmentsActivity extends BaseActivity {
 
@@ -25,6 +28,8 @@ public class DepartmentsActivity extends BaseActivity {
     private LinearLayoutManager linearLayoutManager;
     private DepartmentsRecyclerViewAdapter myDepartmentsRecyclerViewAdapter;
     private TextView expandedImage;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private MyAppBarLayout myAppBarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +39,10 @@ public class DepartmentsActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        refreshPage();
+    }
+
+    public void refreshPage(){
         myDepartmentsRecyclerViewAdapter.clear();
 
         for(Permission permission : Session.user.getPermissions()) {
@@ -48,7 +57,16 @@ public class DepartmentsActivity extends BaseActivity {
     @Override
     protected void initializeView() {
         expandedImage = (TextView) findViewById(R.id.expandedImage);
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        myAppBarLayout = (MyAppBarLayout) findViewById(R.id.app_bar_layout);
+        departmentsListView = (RecyclerView) findViewById(R.id.departments_list);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_departments_swipe_to_refresh_layout);
+        myDepartmentsRecyclerViewAdapter = new DepartmentsRecyclerViewAdapter(this);
+        linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+
+        expandedImage.setBackground(Session.getListViewHeader());
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -63,17 +81,50 @@ public class DepartmentsActivity extends BaseActivity {
             fab.setVisibility(View.GONE);
         }
 
-        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
+                    @Override
+                    public void onSuccess() {
+                        refreshPage();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onUnSuccess() {
+                        refreshPage();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        refreshPage();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+        });
+
         setCollapsingToolbarLayoutTitle(getString(R.string.departments_page_title));
 
-        departmentsListView = (RecyclerView) findViewById(R.id.departments_list);
-        linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         departmentsListView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
 
         departmentsListView.setHasFixedSize(true);
         departmentsListView.setLayoutManager(linearLayoutManager);
-        myDepartmentsRecyclerViewAdapter = new DepartmentsRecyclerViewAdapter(this);
         myDepartmentsRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
+    }
+
+    @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        swipeRefreshLayout.setEnabled(false);
+
+        if(myAppBarLayout.state == MyAppBarLayout.State.EXPANDED){
+            swipeRefreshLayout.setEnabled(true);
+        }
     }
 
     private void setCollapsingToolbarLayoutTitle(String title) {
