@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#dc392a</color>
     <color name="colorAccent">#dc392a</color>
     <color name="background">#565757</color>
+    <color name="cell_background">#5a5b5b</color>
     <color name="white">#FFFFFF</color>
     <color name="lightGray">#B3FFFFFF</color>
 </resources>

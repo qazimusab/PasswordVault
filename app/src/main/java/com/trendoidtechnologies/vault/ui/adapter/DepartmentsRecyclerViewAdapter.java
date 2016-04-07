@@ -86,12 +86,14 @@ public class DepartmentsRecyclerViewAdapter extends RecyclerView.Adapter<Departm
 
         private DepartmentsRecyclerViewAdapter parent;
         public TextView textItemName;
+//        public TextView background;
 
         public ItemHolder(View itemView, DepartmentsRecyclerViewAdapter parent) {
             super(itemView);
             itemView.setOnClickListener(this);
             this.parent = parent;
             textItemName = (TextView) itemView.findViewById(R.id.item_name);
+//            background = (TextView) itemView.findViewById(R.id.background);
         }
 
         public void setItemName(CharSequence name){
