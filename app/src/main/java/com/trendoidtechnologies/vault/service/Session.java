@@ -9,6 +9,7 @@ import android.support.v4.util.LruCache;
 
 import com.trendoidtechnologies.vault.R;
 import com.trendoidtechnologies.vault.datacontract.Computer;
+import com.trendoidtechnologies.vault.datacontract.Credential;
 import com.trendoidtechnologies.vault.datacontract.Token;
 import com.trendoidtechnologies.vault.datacontract.User;
 
@@ -29,6 +30,7 @@ public class Session {
     public static User user;
     public static String currentDepartment;
     public static Computer currentComputer;
+    public static Credential currentCredential;
     public static User currentUser;
     private static DrawerProfile drawerProfile;
     private static LruCache<String, Drawable> lruCache;
@@ -64,6 +66,7 @@ public class Session {
         user = null;
         currentDepartment = null;
         currentComputer = null;
+        currentCredential = null;
         allUsers = null;
         currentUser = null;
     }

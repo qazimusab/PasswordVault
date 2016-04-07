@@ -14,54 +14,59 @@ import com.trendoidtechnologies.vault.datacontract.Credential;
 import com.trendoidtechnologies.vault.service.Session;
 import com.trendoidtechnologies.vault.service.VaultApiClient;
 
-public class AddCredentialActivity extends BaseActivity {
+public class EditCredentialActivity extends BaseActivity {
 
     private EditText mUsernameEt;
     private EditText mPasswordEt;
     private EditText mTypeEt;
-    private Button mAddCredentialBtn;
+    private Button mUpdateCredentialBtn;
     private ProgressBar mProgress;
 
     @Override
     protected void initializeView() {
-        toolbar.setTitle(getString(R.string.add_credential_page_title));
+        toolbar.setTitle(getString(R.string.edit_credential_page_title));
 
-        mUsernameEt = (EditText) findViewById(R.id.add_credential_username);
-        mPasswordEt = (EditText) findViewById(R.id.add_credential_password);
-        mTypeEt = (EditText) findViewById(R.id.add_credential_type);
-        mAddCredentialBtn = (Button) findViewById(R.id.add_credential_btn);
-        mProgress = (ProgressBar) findViewById(R.id.add_credential_progress);
+        mUsernameEt = (EditText) findViewById(R.id.edit_credential_username);
+        mPasswordEt = (EditText) findViewById(R.id.edit_credential_password);
+        mTypeEt = (EditText) findViewById(R.id.edit_credential_type);
+        mUpdateCredentialBtn = (Button) findViewById(R.id.edit_credential_btn);
+        mProgress = (ProgressBar) findViewById(R.id.edit_credential_progress);
 
         mTypeEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.add_credential || id == EditorInfo.IME_NULL) {
-                    addCredential();
+                if (id == R.id.edit_credential || id == EditorInfo.IME_NULL) {
+                    updateCredential();
                     return true;
                 }
                 return false;
             }
         });
 
-        mAddCredentialBtn.setOnClickListener(addCredentialListener);
+        mUpdateCredentialBtn.setOnClickListener(updateCredentialListener);
+
+        mUsernameEt.setText(Session.currentCredential.getUserName());
+        mPasswordEt.setText(Session.currentCredential.getPassword());
+        mTypeEt.setText(Session.currentCredential.getType());
     }
 
-    private View.OnClickListener addCredentialListener = new View.OnClickListener() {
+    private View.OnClickListener updateCredentialListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            addCredential();
+            updateCredential();
         }
     };
 
-    private void addCredential() {
+    private void updateCredential() {
         if(mUsernameEt.getText().toString().equals("") || mPasswordEt.getText().toString().equals("") || mTypeEt.getText().toString().equals("")){
             Toast.makeText(getApplicationContext(), "All fields are required", Toast.LENGTH_LONG).show();
         }
         else {
             hideSoftKeyboard();
             toggleProgress(true);
-            Credential credentialToAdd = new Credential(mUsernameEt.getText().toString(), mPasswordEt.getText().toString(), mTypeEt.getText().toString(), Session.currentComputer.getComputerId());
-            vaultApiClient.addCredential(credentialToAdd, new VaultApiClient.OnCallCompleted() {
+            Credential credentialToUpdate = new Credential(mUsernameEt.getText().toString(), mPasswordEt.getText().toString(), mTypeEt.getText().toString(), Session.currentComputer.getComputerId());
+            credentialToUpdate.setId(Session.currentCredential.getId());
+            vaultApiClient.updateCredential(credentialToUpdate, new VaultApiClient.OnCallCompleted() {
                 @Override
                 public void onSuccess() {
                     vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
@@ -100,7 +105,7 @@ public class AddCredentialActivity extends BaseActivity {
     }
 
     public void toggleProgress(boolean isLoading) {
-        mAddCredentialBtn.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        mUpdateCredentialBtn.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mTypeEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mPasswordEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mUsernameEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
@@ -109,6 +114,6 @@ public class AddCredentialActivity extends BaseActivity {
 
     @Override
     protected int activityToInflate() {
-        return R.layout.activity_add_credential;
+        return R.layout.activity_edit_credential;
     }
 }

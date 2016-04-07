@@ -43,6 +43,9 @@
             android:name=".ui.AddCredentialActivity"
             android:theme="@style/AppTheme"></activity>
         <activity
+            android:name=".ui.EditCredentialActivity"
+            android:theme="@style/AppTheme"></activity>
+        <activity
             android:name=".ui.AddUserActivity"
             android:theme="@style/AppTheme"></activity>
         <activity

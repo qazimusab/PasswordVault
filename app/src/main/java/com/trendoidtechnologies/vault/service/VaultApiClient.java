@@ -251,6 +251,25 @@ public class VaultApiClient {
         });
     }
 
+    public void updateCredential(Credential credentialToUpdate, final OnCallCompleted onCallCompleted) {
+        vaultService.updateCredential("Bearer " + Session.token.getAccessToken(), credentialToUpdate, credentialToUpdate.getId()).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if(response.isSuccessful()){
+                    onCallCompleted.onSuccess();
+                }
+                else {
+                    onCallCompleted.onUnSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                onCallCompleted.onFailure();
+            }
+        });
+    }
+
     public interface OnCallCompleted {
         void onSuccess();
         void onUnSuccess();

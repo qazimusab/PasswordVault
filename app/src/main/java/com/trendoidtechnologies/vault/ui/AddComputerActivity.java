@@ -65,9 +65,9 @@ public class AddComputerActivity extends BaseActivity {
                     vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
                         @Override
                         public void onSuccess() {
-                            toggleProgress(false);
                             Toast.makeText(getApplicationContext(), "Your computer was added successfully!", Toast.LENGTH_LONG).show();
                             onBackPressed();
+                            toggleProgress(false);
                         }
 
                         @Override

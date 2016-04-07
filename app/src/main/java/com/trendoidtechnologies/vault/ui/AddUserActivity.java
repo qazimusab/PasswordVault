@@ -97,9 +97,9 @@ public class AddUserActivity extends BaseActivity {
                     vaultApiClient.getAllUsers(new VaultApiClient.OnCallCompleted() {
                         @Override
                         public void onSuccess() {
-                            toggleProgress(false);
                             Toast.makeText(getApplicationContext(), "User was added successfully!", Toast.LENGTH_LONG).show();
                             onBackPressed();
+                            toggleProgress(false);
                         }
 
                         @Override

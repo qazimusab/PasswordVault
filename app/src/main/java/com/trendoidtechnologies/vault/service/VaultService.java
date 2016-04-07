@@ -97,4 +97,7 @@ public interface VaultService {
 
     @DELETE("api/AspNetUsers/{id}")
     Call<User> deleteUser(@Header("Authorization") String token, @Path("id") String userId);
+
+    @PUT("api/Credentials/{id}")
+    Call<Void> updateCredential(@Header("Authorization") String token, @Body Credential credential , @Path("id") int credentialId);
 }

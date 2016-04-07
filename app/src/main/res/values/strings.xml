@@ -24,7 +24,7 @@
     <string name="departments_page_title">Departments</string>
     <string name="computers_page_title">Computers</string>
     <string name="add_department_page_title">Add Department</string>
-    <string name="add_department">Add</string>
+    <string name="add">Add</string>
     <string name="department">Department</string>
     <string name="users_page_title">Users</string>
     <string name="computer">Computer</string>
@@ -37,4 +37,7 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
+    <string name="add_credential_page_title">Add Credential</string>
+    <string name="edit_credential_page_title">Edit Credential</string>
+    <string name="update">Update</string>
 </resources>

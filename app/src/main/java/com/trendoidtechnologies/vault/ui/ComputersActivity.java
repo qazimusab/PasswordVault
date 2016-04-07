@@ -39,13 +39,6 @@ public class ComputersActivity extends BaseActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
     private ItemTouchHelper itemTouchHelper;
 
-
-    @Override
-    public void onBackPressed() {
-        Session.currentDepartment = "";
-        super.onBackPressed();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

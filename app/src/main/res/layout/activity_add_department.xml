@@ -40,7 +40,7 @@
         android:id="@+id/add_department_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/add_department"
+        android:text="@string/add"
         android:transitionName="button"
         android:layout_gravity="center_horizontal"
         android:layout_margin="@dimen/fab_margin"

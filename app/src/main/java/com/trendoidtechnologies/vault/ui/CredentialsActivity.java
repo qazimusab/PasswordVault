@@ -194,12 +194,6 @@ public class CredentialsActivity extends BaseActivity {
         collapsingToolbarLayout.setExpandedTitleTypeface(Typeface.DEFAULT_BOLD);
     }
 
-    @Override
-    public void onBackPressed() {
-        Session.currentComputer = null;
-        super.onBackPressed();
-    }
-
     private CredentialsRecyclerViewAdapter.OnItemClickListener onItemClickListener = new CredentialsRecyclerViewAdapter.OnItemClickListener() {
         @Override
         public void onItemClick(CredentialsRecyclerViewAdapter.ItemHolder item, int position) {
@@ -207,11 +201,8 @@ public class CredentialsActivity extends BaseActivity {
 
 
             Credential itemValue = credentialsRecyclerViewAdapter.getItemAtPosition(position);
-
-            // Show Alert
-//            Toast.makeText(getApplicationContext(),
-//                    "Position :"+itemPosition+"  ListItem : " +itemValue , Toast.LENGTH_LONG)
-//                    .show();
+            Session.currentCredential = itemValue;
+            navigateToActivity(EditCredentialActivity.class);
         }
     };
 

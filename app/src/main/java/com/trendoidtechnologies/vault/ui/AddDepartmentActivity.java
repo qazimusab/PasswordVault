@@ -71,9 +71,9 @@ public class AddDepartmentActivity extends BaseActivity {
                             vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
                                 @Override
                                 public void onSuccess() {
-                                    toggleProgress(false);
                                     Toast.makeText(getApplicationContext(), "Your Department was added successfully!", Toast.LENGTH_LONG).show();
                                     onBackPressed();
+                                    toggleProgress(false);
                                 }
 
                                 @Override
