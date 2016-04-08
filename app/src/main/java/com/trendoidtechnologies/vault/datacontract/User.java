@@ -223,6 +223,19 @@ public class User {
         this.Permissions = Permissions;
     }
 
+    public boolean hasPermission(Permission permissionToBeChecked) {
+        if(permissionToBeChecked == null || permissionToBeChecked.getDepartmentName() == null) {
+            return false;
+        }
+        boolean hasPermission = false;
+        for (Permission permission : Permissions) {
+            if(permission.getDepartmentName().equals(permissionToBeChecked.getDepartmentName())) {
+                hasPermission = true;
+            }
+        }
+        return hasPermission;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

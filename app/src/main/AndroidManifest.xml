@@ -49,6 +49,9 @@
             android:name=".ui.AddUserActivity"
             android:theme="@style/AppTheme"></activity>
         <activity
+            android:name=".ui.EditUserActivity"
+            android:theme="@style/AppTheme"></activity>
+        <activity
             android:name=".ui.UsersActivity"
             android:theme="@style/AppTheme"></activity>
     </application>

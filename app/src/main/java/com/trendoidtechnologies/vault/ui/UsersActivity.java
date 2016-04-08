@@ -192,6 +192,7 @@ public class UsersActivity extends BaseActivity {
         public void onItemClick(UsersRecyclerViewAdapter.ItemHolder item, int position) {
             User itemValue = usersRecyclerViewAdapter.getUserAtPosition(position);
             Session.currentUser = itemValue;
+            navigateToActivity(EditUserActivity.class);
         }
     };
 

@@ -21,14 +21,14 @@ import com.trendoidtechnologies.vault.ui.widgets.MultiSpinnerSearch;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddUserActivity extends BaseActivity {
+public class EditUserActivity extends BaseActivity {
 
     private EditText mEmailEt;
     private EditText mPasswordEt;
     private EditText mConfirmPasswordEt;
     private EditText mFirstNameEt;
     private EditText mLastNameEt;
-    private Button mAddUserBtn;
+    private Button mUpdateUserBtn;
     private ProgressBar mProgress;
     private MultiSpinnerSearch permissionsSpinner;
     private List<KeyPairBoolData> listArray;
@@ -37,27 +37,31 @@ public class AddUserActivity extends BaseActivity {
     protected void initializeView() {
         toolbar.setTitle(getString(R.string.add_computer_page_title));
 
-        permissionsSpinner = (MultiSpinnerSearch) findViewById(R.id.add_user_permissions_spinner);
-        mEmailEt = (EditText) findViewById(R.id.add_user_email);
-        mFirstNameEt = (EditText) findViewById(R.id.add_user_first_name);
-        mLastNameEt = (EditText) findViewById(R.id.add_user_last_name);
-        mPasswordEt = (EditText) findViewById(R.id.add_user_password);
-        mConfirmPasswordEt = (EditText) findViewById(R.id.add_user_confirm_password);
-        mProgress = (ProgressBar) findViewById(R.id.add_user_progress);
-        mAddUserBtn = (Button) findViewById(R.id.add_user_btn);
+        permissionsSpinner = (MultiSpinnerSearch) findViewById(R.id.edit_user_permissions_spinner);
+        mEmailEt = (EditText) findViewById(R.id.edit_user_email);
+        mFirstNameEt = (EditText) findViewById(R.id.edit_user_first_name);
+        mLastNameEt = (EditText) findViewById(R.id.edit_user_last_name);
+        mPasswordEt = (EditText) findViewById(R.id.edit_user_password);
+        mConfirmPasswordEt = (EditText) findViewById(R.id.edit_user_confirm_password);
+        mProgress = (ProgressBar) findViewById(R.id.edit_user_progress);
+        mUpdateUserBtn = (Button) findViewById(R.id.edit_user_btn);
 
         mConfirmPasswordEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.add_user || id == EditorInfo.IME_NULL) {
-                    addUser();
+                if (id == R.id.update_user || id == EditorInfo.IME_NULL) {
+                    updateUser();
                     return true;
                 }
                 return false;
             }
         });
 
-        mAddUserBtn.setOnClickListener(addUserListener);
+        mEmailEt.setText(Session.currentUser.getEmail());
+        mFirstNameEt.setText(Session.currentUser.getFirstName());
+        mLastNameEt.setText(Session.currentUser.getLastName());
+
+        mUpdateUserBtn.setOnClickListener(updateUserListener);
 
         listArray = new ArrayList<>();
         if (Session.user.getPermissions() != null && Session.user.getPermissions().size() > 0) {
@@ -65,7 +69,7 @@ public class AddUserActivity extends BaseActivity {
                 KeyPairBoolData keyPairBoolData = new KeyPairBoolData();
                 keyPairBoolData.setId(i + 1);
                 keyPairBoolData.setPermission(Session.user.getPermissions().get(i));
-                keyPairBoolData.setSelected(false);
+                keyPairBoolData.setSelected(Session.currentUser.hasPermission(keyPairBoolData.getPermission()));
                 listArray.add(keyPairBoolData);
             }
         }
@@ -74,7 +78,16 @@ public class AddUserActivity extends BaseActivity {
          * -1 is no by default selection
          * 0 to length will select corresponding values
          */
-        permissionsSpinner.setItems(listArray, "Permissions", -1, new MultiSpinnerSearch.MultiSpinnerSearchListener() {
+        String spinnerText = "Permissions";
+        if(Session.currentUser.getPermissions() != null && Session.currentUser.getPermissions().size() > 0) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Permission permission : Session.currentUser.getPermissions()) {
+                stringBuilder.append(permission.getDepartmentName()).append(", ");
+            }
+            spinnerText = stringBuilder.toString();
+            spinnerText = spinnerText.substring(0, spinnerText.length() - 2);
+        }
+        permissionsSpinner.setItems(listArray, spinnerText, -1, new MultiSpinnerSearch.MultiSpinnerSearchListener() {
             @Override
             public void onItemsSelected(List<KeyPairBoolData> items) {
 
@@ -88,10 +101,10 @@ public class AddUserActivity extends BaseActivity {
 
     }
 
-    private View.OnClickListener addUserListener = new View.OnClickListener() {
+    private View.OnClickListener updateUserListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            addUser();
+            updateUser();
         }
     };
 
@@ -103,7 +116,7 @@ public class AddUserActivity extends BaseActivity {
                 && !confirmPassword.equals("");
     }
 
-    private void addUser() {
+    private void updateUser() {
         String firstName = mFirstNameEt.getText().toString();
         String lastName = mLastNameEt.getText().toString();
         String email = mEmailEt.getText().toString();
@@ -117,102 +130,60 @@ public class AddUserActivity extends BaseActivity {
             Toast.makeText(getApplicationContext(), "Password must contain at least 8 characters, one capital letter, and one special character.", Toast.LENGTH_LONG).show();
         } else if (!password.equals(confirmPassword)) {
             Toast.makeText(getApplicationContext(), "Passwords do not match.", Toast.LENGTH_LONG).show();
-        } else if (isEmailTaken(email)) {
-            Toast.makeText(getApplicationContext(), "There is already an account associated with that email address.", Toast.LENGTH_LONG).show();
         } else {
             hideSoftKeyboard();
             toggleProgress(true);
-            final List<Permission> permissionsToGive = new ArrayList<>();
+            final List<Permission> updatedPermissions = new ArrayList<>();
             if (listArray != null && listArray.size() > 0) {
                 for (KeyPairBoolData keyPairBoolData : listArray) {
                     if (keyPairBoolData.isSelected()) {
-                        permissionsToGive.add(keyPairBoolData.getPermission());
+                        updatedPermissions.add(keyPairBoolData.getPermission());
                     }
                 }
             }
-            final User userToAdd = new User(firstName, lastName, password, confirmPassword, email, false);
-            vaultApiClient.addUser(userToAdd, new VaultApiClient.OnCallCompleted() {
+            final User userToUpdate = Session.currentUser;
+            userToUpdate.setEmail(email);
+            userToUpdate.setFirstName(firstName);
+            userToUpdate.setLastName(lastName);
+            userToUpdate.setPassword(password);
+            userToUpdate.setConfirmPassword(confirmPassword);
+            userToUpdate.setPermissions(updatedPermissions);
+
+            vaultApiClient.updateUser(userToUpdate, new VaultApiClient.OnCallCompleted() {
                 @Override
                 public void onSuccess() {
                     vaultApiClient.getAllUsers(new VaultApiClient.OnCallCompleted() {
                         @Override
                         public void onSuccess() {
-                            if(permissionsToGive.size() > 0) {
-                                User registeredUser = null;
-                                for(User user : Session.allUsers) {
-                                    if(user.getEmail().equals(userToAdd.getEmail())) {
-                                        registeredUser = user;
-                                    }
-                                }
-                                registeredUser.setPermissions(permissionsToGive);
-                                vaultApiClient.updateUser(registeredUser, new VaultApiClient.OnCallCompleted() {
-                                    @Override
-                                    public void onSuccess() {
-                                        vaultApiClient.getAllUsers(new VaultApiClient.OnCallCompleted() {
-                                            @Override
-                                            public void onSuccess() {
-                                                Toast.makeText(getApplicationContext(), "User was added successfully!", Toast.LENGTH_LONG).show();
-                                                onBackPressed();
-                                                toggleProgress(false);
-                                            }
-
-                                            @Override
-                                            public void onUnSuccess() {
-
-                                            }
-
-                                            @Override
-                                            public void onFailure() {
-
-                                            }
-                                        });
-                                    }
-
-                                    @Override
-                                    public void onUnSuccess() {
-
-                                    }
-
-                                    @Override
-                                    public void onFailure() {
-
-                                    }
-                                });
-                            }
-                            else {
-                                Toast.makeText(getApplicationContext(), "User was added successfully!", Toast.LENGTH_LONG).show();
-                                onBackPressed();
-                                toggleProgress(false);
-                            }
+                            Toast.makeText(getApplicationContext(), "User was added successfully!", Toast.LENGTH_LONG).show();
+                            onBackPressed();
+                            toggleProgress(false);
                         }
 
                         @Override
                         public void onUnSuccess() {
-                            Toast.makeText(getApplicationContext(), "There was an error adding the user.", Toast.LENGTH_LONG).show();
-                            toggleProgress(false);
+
                         }
 
                         @Override
                         public void onFailure() {
-                            Toast.makeText(getApplicationContext(), "Something went wrong :(", Toast.LENGTH_LONG).show();
-                            toggleProgress(false);
+
                         }
                     });
-
                 }
 
                 @Override
                 public void onUnSuccess() {
-                    toggleProgress(false);
-                    Toast.makeText(getApplicationContext(), "There was an error adding the user.", Toast.LENGTH_LONG).show();
+
                 }
 
                 @Override
                 public void onFailure() {
-                    toggleProgress(false);
-                    Toast.makeText(getApplicationContext(), "Something went wrong :(", Toast.LENGTH_LONG).show();
+
                 }
             });
+
+
         }
     }
 
@@ -249,13 +220,13 @@ public class AddUserActivity extends BaseActivity {
         mPasswordEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mConfirmPasswordEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mLastNameEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
-        mAddUserBtn.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        mUpdateUserBtn.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         permissionsSpinner.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mProgress.setVisibility(isLoading ? View.VISIBLE : View.GONE);
     }
 
     @Override
     protected int activityToInflate() {
-        return R.layout.activity_add_user;
+        return R.layout.activity_edit_user;
     }
 }
