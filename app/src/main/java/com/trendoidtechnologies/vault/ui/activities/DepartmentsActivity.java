@@ -17,8 +17,9 @@ import android.widget.Toast;
 
 import com.trendoidtechnologies.vault.R;
 import com.trendoidtechnologies.vault.datacontract.Permission;
-import com.trendoidtechnologies.vault.service.Session;
+import com.trendoidtechnologies.vault.session.Session;
 import com.trendoidtechnologies.vault.service.VaultApiClient;
+import com.trendoidtechnologies.vault.ui.activities.base.BaseActivity;
 import com.trendoidtechnologies.vault.ui.adapter.DepartmentsRecyclerViewAdapter;
 import com.trendoidtechnologies.vault.ui.widgets.DividerItemDecoration;
 import com.trendoidtechnologies.vault.ui.widgets.MyAppBarLayout;

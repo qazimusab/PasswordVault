@@ -12,8 +12,9 @@ import android.widget.Toast;
 import com.trendoidtechnologies.vault.R;
 import com.trendoidtechnologies.vault.datacontract.Permission;
 import com.trendoidtechnologies.vault.datacontract.User;
-import com.trendoidtechnologies.vault.service.Session;
+import com.trendoidtechnologies.vault.session.Session;
 import com.trendoidtechnologies.vault.service.VaultApiClient;
+import com.trendoidtechnologies.vault.ui.activities.base.BaseActivity;
 
 public class AddDepartmentActivity extends BaseActivity {
 

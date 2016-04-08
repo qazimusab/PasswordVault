@@ -7,6 +7,7 @@ import com.trendoidtechnologies.vault.datacontract.Credential;
 import com.trendoidtechnologies.vault.datacontract.Permission;
 import com.trendoidtechnologies.vault.datacontract.Token;
 import com.trendoidtechnologies.vault.datacontract.User;
+import com.trendoidtechnologies.vault.session.Session;
 
 import java.util.List;
 

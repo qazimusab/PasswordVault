@@ -1,4 +1,4 @@
-package com.trendoidtechnologies.vault.service;
+package com.trendoidtechnologies.vault.session;
 
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;

@@ -15,8 +15,9 @@ import android.widget.Toast;
 import com.trendoidtechnologies.vault.R;
 import com.trendoidtechnologies.vault.datacontract.Token;
 import com.trendoidtechnologies.vault.datacontract.User;
-import com.trendoidtechnologies.vault.service.Session;
+import com.trendoidtechnologies.vault.session.Session;
 import com.trendoidtechnologies.vault.service.VaultService;
+import com.trendoidtechnologies.vault.ui.activities.base.BaseActivity;
 
 import java.util.List;
 

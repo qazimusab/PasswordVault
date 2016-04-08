@@ -1,4 +1,4 @@
-package com.trendoidtechnologies.vault.ui.activities;
+package com.trendoidtechnologies.vault.ui.activities.base;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,8 +14,11 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.trendoidtechnologies.vault.R;
-import com.trendoidtechnologies.vault.service.Session;
+import com.trendoidtechnologies.vault.session.Session;
 import com.trendoidtechnologies.vault.service.VaultApiClient;
+import com.trendoidtechnologies.vault.ui.activities.DepartmentsActivity;
+import com.trendoidtechnologies.vault.ui.activities.LoginActivity;
+import com.trendoidtechnologies.vault.ui.activities.UsersActivity;
 
 import trendoidtechnologies.com.navigationdrawerlibrary.DrawerActivity;
 import trendoidtechnologies.com.navigationdrawerlibrary.structure.DrawerItem;
@@ -30,7 +33,7 @@ import java.util.List;
  */
 public abstract class BaseActivity extends DrawerActivity {
 
-    VaultApiClient vaultApiClient;
+    protected VaultApiClient vaultApiClient;
     private Bundle extras;
     protected Toolbar toolbar;
     private List<DrawerItem> navigationItems;
