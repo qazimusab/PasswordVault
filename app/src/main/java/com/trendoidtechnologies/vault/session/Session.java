@@ -36,12 +36,21 @@ public class Session {
 
     public static DrawerProfile getDrawerProfileInstance(boolean isAdmin) {
         if(drawerProfile == null) {
-            drawerProfile = new DrawerProfile()
-                    .setId(1)
-                    .setRoundedAvatar((BitmapDrawable) lruCache.get(PROFILE_AVATAR))
-                    .setBackground(lruCache.get(NAV_DRAWER_HEADER))
-                    .setName(Session.user.getFirstName() + " " + Session.user.getLastName())
-                    .setDescription(isAdmin ? "Administrator" : "User");
+            if(isAdmin) {
+                drawerProfile = new DrawerProfile()
+                        .setId(1)
+                        .setRoundedAvatar((BitmapDrawable) lruCache.get(PROFILE_AVATAR))
+                        .setBackground(lruCache.get(NAV_DRAWER_HEADER))
+                        .setName(Session.user.getFirstName() + " " + Session.user.getLastName())
+                        .setDescription("Administrator");
+            }
+            else {
+                drawerProfile = new DrawerProfile()
+                        .setId(1)
+                        .setBackground(lruCache.get(NAV_DRAWER_HEADER))
+                        .setName(Session.user.getFirstName() + " " + Session.user.getLastName())
+                        .setDescription("User");
+            }
         }
         return drawerProfile;
     }
@@ -51,7 +60,6 @@ public class Session {
     }
 
     public static void cacheAssets(Context context){
-
         if(lruCache == null) {
             lruCache = new LruCache<>(5);
             lruCache.put(PROFILE_AVATAR, ContextCompat.getDrawable(context, R.drawable.profile_avatar));
@@ -68,5 +76,6 @@ public class Session {
         currentCredential = null;
         allUsers = null;
         currentUser = null;
+        drawerProfile = null;
     }
 }

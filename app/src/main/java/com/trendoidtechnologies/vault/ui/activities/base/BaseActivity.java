@@ -165,9 +165,7 @@ public abstract class BaseActivity extends DrawerActivity {
 
     protected abstract void initializeView();
 
-    protected abstract
-    @LayoutRes
-    int activityToInflate();
+    protected abstract @LayoutRes int activityToInflate();
 
     @Override
     public void onBackPressed() {
