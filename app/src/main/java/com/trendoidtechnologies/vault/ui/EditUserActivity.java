@@ -1,5 +1,6 @@
 package com.trendoidtechnologies.vault.ui;
 
+import android.graphics.Color;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -54,7 +55,7 @@ public class EditUserActivity extends BaseActivity {
         });
 
         mEmailEt.setText(Session.currentUser.getEmail());
-        mEmailEt.setKeyListener(null);
+        disableEditText(mEmailEt);
         mFirstNameEt.setText(Session.currentUser.getFirstName());
         mLastNameEt.setText(Session.currentUser.getLastName());
 
@@ -169,9 +170,15 @@ public class EditUserActivity extends BaseActivity {
 
                 }
             });
-
-
         }
+    }
+
+    private void disableEditText(EditText editText) {
+        editText.setFocusable(false);
+        editText.setEnabled(false);
+        editText.setCursorVisible(false);
+        editText.setKeyListener(null);
+        editText.setBackgroundColor(Color.TRANSPARENT);
     }
 
     private boolean isEmailTaken(String email) {
