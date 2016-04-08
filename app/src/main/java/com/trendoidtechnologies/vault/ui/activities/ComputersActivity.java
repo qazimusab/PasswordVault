@@ -1,7 +1,9 @@
-package com.trendoidtechnologies.vault.ui;
+package com.trendoidtechnologies.vault.ui.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -11,24 +13,27 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.trendoidtechnologies.vault.R;
-import com.trendoidtechnologies.vault.datacontract.User;
+import com.trendoidtechnologies.vault.datacontract.Computer;
+import com.trendoidtechnologies.vault.datacontract.Permission;
 import com.trendoidtechnologies.vault.service.Session;
 import com.trendoidtechnologies.vault.service.VaultApiClient;
-import com.trendoidtechnologies.vault.ui.adapter.UsersRecyclerViewAdapter;
+import com.trendoidtechnologies.vault.ui.adapter.ComputerRecyclerViewAdapter;
 import com.trendoidtechnologies.vault.ui.widgets.DividerItemDecoration;
 import com.trendoidtechnologies.vault.ui.widgets.MyAppBarLayout;
 
-public class UsersActivity extends BaseActivity {
+public class ComputersActivity extends BaseActivity {
 
+    private String department;
     private CollapsingToolbarLayout collapsingToolbarLayout;
-    private RecyclerView usersListView;
+    private RecyclerView computersListView;
     private LinearLayoutManager linearLayoutManager;
-    private UsersRecyclerViewAdapter usersRecyclerViewAdapter;
+    private ComputerRecyclerViewAdapter computerRecyclerViewAdapter;
     private TextView expandedImage;
     private MyAppBarLayout myAppBarLayout;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -37,34 +42,40 @@ public class UsersActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        expandedImage = (TextView) findViewById(R.id.expandedImage);
+        expandedImage.setBackground(Session.getListViewHeader());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            expandedImage.setTransitionName(Session.currentDepartment);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshPage();
     }
 
     @Override
     protected void initializeView() {
-        expandedImage = (TextView) findViewById(R.id.expandedImage);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         myAppBarLayout = (MyAppBarLayout) findViewById(R.id.app_bar_layout);
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_users_swipe_to_refresh_layout);
-
-        expandedImage.setBackground(Session.getListViewHeader());
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_computers_swipe_to_refresh_layout);
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(UsersActivity.this, AddUserActivity.class);
+                Intent intent = new Intent(ComputersActivity.this, AddComputerActivity.class);
                 ActivityOptionsCompat options = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation(UsersActivity.this, expandedImage, "button");
+                        makeSceneTransitionAnimation(ComputersActivity.this, expandedImage, "button");
                 startActivity(intent, options.toBundle());
             }
         });
-
-
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                vaultApiClient.getAllUsers(new VaultApiClient.OnCallCompleted() {
+                vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
                     @Override
                     public void onSuccess() {
                         refreshPage();
@@ -86,17 +97,21 @@ public class UsersActivity extends BaseActivity {
             }
         });
 
+        department = Session.currentDepartment;
+
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        setCollapsingToolbarLayoutTitle(getString(R.string.users_page_title));
+        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimaryDark));
+        collapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(R.color.white));
+        setCollapsingToolbarLayoutTitle(department);
 
-        usersListView = (RecyclerView) findViewById(R.id.departments_list);
+        computersListView = (RecyclerView) findViewById(R.id.departments_list);
         linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        usersListView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
+        computersListView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
 
-        usersListView.setHasFixedSize(true);
-        usersListView.setLayoutManager(linearLayoutManager);
-        usersRecyclerViewAdapter = new UsersRecyclerViewAdapter(this);
-        usersRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
+        computersListView.setHasFixedSize(true);
+        computersListView.setLayoutManager(linearLayoutManager);
+        computerRecyclerViewAdapter = new ComputerRecyclerViewAdapter(this);
+        computerRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
 
         final ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
@@ -108,16 +123,16 @@ public class UsersActivity extends BaseActivity {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 swipeRefreshLayout.setRefreshing(true);
-                User userSwiped = usersRecyclerViewAdapter.getUserAtPosition(viewHolder.getAdapterPosition());
-                vaultApiClient.deleteUser(userSwiped.getId(), new VaultApiClient.OnCallCompleted() {
+                Computer computerSwiped = computerRecyclerViewAdapter.getItemAtPosition(viewHolder.getAdapterPosition());
+                vaultApiClient.deleteComputer(computerSwiped.getComputerId(), new VaultApiClient.OnCallCompleted() {
                     @Override
                     public void onSuccess() {
-                        vaultApiClient.getAllUsers(new VaultApiClient.OnCallCompleted() {
+                        vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
                             @Override
                             public void onSuccess() {
                                 refreshPage();
                                 swipeRefreshLayout.setRefreshing(false);
-                                Toast.makeText(getApplicationContext(), "The user was successfully deleted", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "The computer was successfully deleted", Toast.LENGTH_LONG).show();
                             }
 
                             @Override
@@ -147,25 +162,21 @@ public class UsersActivity extends BaseActivity {
         };
 
         itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(usersListView);
-    }
+        itemTouchHelper.attachToRecyclerView(computersListView);
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        refreshPage();
     }
 
     private void refreshPage() {
-        usersRecyclerViewAdapter.clear();
-        for(User user : Session.allUsers) {
-            if(!user.isAdmin()) {
-                usersRecyclerViewAdapter.add(user);
+        computerRecyclerViewAdapter.clear();
+        for(Permission permissions : Session.user.getPermissions()){
+            if(permissions.getDepartmentName().equals(department)) {
+                for(Computer computer : permissions.getComputers()){
+                    computerRecyclerViewAdapter.add(computer);
+                }
             }
         }
-
-        usersListView.setAdapter(usersRecyclerViewAdapter);
-        usersListView.setItemAnimator(new DefaultItemAnimator());
+        computersListView.setAdapter(computerRecyclerViewAdapter);
+        computersListView.setItemAnimator(new DefaultItemAnimator());
     }
 
     @Override
@@ -178,27 +189,33 @@ public class UsersActivity extends BaseActivity {
         }
     }
 
-
     private void setCollapsingToolbarLayoutTitle(String title) {
-        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimaryDark));
-        collapsingToolbarLayout.setExpandedTitleTypeface(Typeface.DEFAULT_BOLD);
-        collapsingToolbarLayout.setCollapsedTitleTypeface(Typeface.DEFAULT);
-        collapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(R.color.white));
         collapsingToolbarLayout.setTitle(title);
+        collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
+        collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
+        collapsingToolbarLayout.setExpandedTitleTypeface(Typeface.DEFAULT_BOLD);
     }
 
-    private UsersRecyclerViewAdapter.OnItemClickListener onItemClickListener = new UsersRecyclerViewAdapter.OnItemClickListener() {
+    private ComputerRecyclerViewAdapter.OnItemClickListener onItemClickListener = new ComputerRecyclerViewAdapter.OnItemClickListener() {
         @Override
-        public void onItemClick(UsersRecyclerViewAdapter.ItemHolder item, int position) {
-            User itemValue = usersRecyclerViewAdapter.getUserAtPosition(position);
-            Session.currentUser = itemValue;
-            navigateToActivity(EditUserActivity.class);
+        public void onItemClick(ComputerRecyclerViewAdapter.ItemHolder item, int position) {
+            Computer itemValue = computerRecyclerViewAdapter.getItemAtPosition(position);
+            Session.currentComputer = itemValue;
+            Intent intent = new Intent(ComputersActivity.this, CredentialsActivity.class);
+            ActivityOptionsCompat options = ActivityOptionsCompat.
+                    makeSceneTransitionAnimation(ComputersActivity.this, item.textItemName, itemValue.getComputerName());
+            startActivity(intent, options.toBundle());
         }
     };
 
     @Override
     protected int activityToInflate() {
-        return R.layout.activity_users;
+        return R.layout.activity_computers;
     }
 
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+        return super.onCreateView(parent, name, context, attrs);
+
+    }
 }

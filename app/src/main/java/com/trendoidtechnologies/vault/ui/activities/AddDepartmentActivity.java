@@ -1,4 +1,4 @@
-package com.trendoidtechnologies.vault.ui;
+package com.trendoidtechnologies.vault.ui.activities;
 
 import android.view.KeyEvent;
 import android.view.View;

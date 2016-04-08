@@ -1,9 +1,7 @@
-package com.trendoidtechnologies.vault.ui;
+package com.trendoidtechnologies.vault.ui.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
@@ -11,22 +9,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.util.LruCache;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.trendoidtechnologies.vault.R;
-import com.trendoidtechnologies.vault.datacontract.Computer;
-import com.trendoidtechnologies.vault.datacontract.Credential;
-import com.trendoidtechnologies.vault.datacontract.Token;
-import com.trendoidtechnologies.vault.datacontract.User;
 import com.trendoidtechnologies.vault.service.Session;
 import com.trendoidtechnologies.vault.service.VaultApiClient;
 
 import trendoidtechnologies.com.navigationdrawerlibrary.DrawerActivity;
 import trendoidtechnologies.com.navigationdrawerlibrary.structure.DrawerItem;
-import trendoidtechnologies.com.navigationdrawerlibrary.structure.DrawerProfile;
 import trendoidtechnologies.com.navigationdrawerlibrary.theme.DrawerTheme;
 
 import java.util.ArrayList;

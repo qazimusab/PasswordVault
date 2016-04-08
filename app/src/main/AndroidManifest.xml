@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.LoginActivity"
+            android:name=".ui.activities.LoginActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -25,34 +25,34 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.DepartmentsActivity"
+            android:name=".ui.activities.DepartmentsActivity"
             android:theme="@style/AppTheme"></activity>
         <activity
-            android:name=".ui.ComputersActivity"
+            android:name=".ui.activities.ComputersActivity"
             android:theme="@style/AppTheme"></activity>
         <activity
-            android:name=".ui.CredentialsActivity"
+            android:name=".ui.activities.CredentialsActivity"
             android:theme="@style/AppTheme"></activity>
         <activity
-            android:name=".ui.AddDepartmentActivity"
+            android:name=".ui.activities.AddDepartmentActivity"
             android:theme="@style/AppTheme"></activity>
         <activity
-            android:name=".ui.AddComputerActivity"
+            android:name=".ui.activities.AddComputerActivity"
             android:theme="@style/AppTheme"></activity>
         <activity
-            android:name=".ui.AddCredentialActivity"
+            android:name=".ui.activities.AddCredentialActivity"
             android:theme="@style/AppTheme"></activity>
         <activity
-            android:name=".ui.EditCredentialActivity"
+            android:name=".ui.activities.EditCredentialActivity"
             android:theme="@style/AppTheme"></activity>
         <activity
-            android:name=".ui.AddUserActivity"
+            android:name=".ui.activities.AddUserActivity"
             android:theme="@style/AppTheme"></activity>
         <activity
-            android:name=".ui.EditUserActivity"
+            android:name=".ui.activities.EditUserActivity"
             android:theme="@style/AppTheme"></activity>
         <activity
-            android:name=".ui.UsersActivity"
+            android:name=".ui.activities.UsersActivity"
             android:theme="@style/AppTheme"></activity>
     </application>
 

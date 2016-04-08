@@ -1,4 +1,4 @@
-package com.trendoidtechnologies.vault.ui;
+package com.trendoidtechnologies.vault.ui.activities;
 
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -16,22 +16,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.trendoidtechnologies.vault.R;
-import com.trendoidtechnologies.vault.datacontract.Permission;
+import com.trendoidtechnologies.vault.datacontract.User;
 import com.trendoidtechnologies.vault.service.Session;
 import com.trendoidtechnologies.vault.service.VaultApiClient;
-import com.trendoidtechnologies.vault.ui.adapter.DepartmentsRecyclerViewAdapter;
+import com.trendoidtechnologies.vault.ui.adapter.UsersRecyclerViewAdapter;
 import com.trendoidtechnologies.vault.ui.widgets.DividerItemDecoration;
 import com.trendoidtechnologies.vault.ui.widgets.MyAppBarLayout;
 
-public class DepartmentsActivity extends BaseActivity {
+public class UsersActivity extends BaseActivity {
 
     private CollapsingToolbarLayout collapsingToolbarLayout;
-    private RecyclerView departmentsListView;
+    private RecyclerView usersListView;
     private LinearLayoutManager linearLayoutManager;
-    private DepartmentsRecyclerViewAdapter myDepartmentsRecyclerViewAdapter;
+    private UsersRecyclerViewAdapter usersRecyclerViewAdapter;
     private TextView expandedImage;
-    private SwipeRefreshLayout swipeRefreshLayout;
     private MyAppBarLayout myAppBarLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private ItemTouchHelper itemTouchHelper;
 
     @Override
@@ -40,56 +40,31 @@ public class DepartmentsActivity extends BaseActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        refreshPage();
-    }
-
-    public void refreshPage(){
-        myDepartmentsRecyclerViewAdapter.clear();
-
-        for(Permission permission : Session.user.getPermissions()) {
-
-            myDepartmentsRecyclerViewAdapter.add(permission.getDepartmentName());
-        }
-
-        departmentsListView.setAdapter(myDepartmentsRecyclerViewAdapter);
-        departmentsListView.setItemAnimator(new DefaultItemAnimator());
-    }
-
-    @Override
     protected void initializeView() {
         expandedImage = (TextView) findViewById(R.id.expandedImage);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         myAppBarLayout = (MyAppBarLayout) findViewById(R.id.app_bar_layout);
-        departmentsListView = (RecyclerView) findViewById(R.id.departments_list);
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_departments_swipe_to_refresh_layout);
-        myDepartmentsRecyclerViewAdapter = new DepartmentsRecyclerViewAdapter(this);
-        linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_users_swipe_to_refresh_layout);
 
         expandedImage.setBackground(Session.getListViewHeader());
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(DepartmentsActivity.this, AddDepartmentActivity.class);
+                Intent intent = new Intent(UsersActivity.this, AddUserActivity.class);
                 ActivityOptionsCompat options = ActivityOptionsCompat.
-                        makeSceneTransitionAnimation(DepartmentsActivity.this, expandedImage, "button");
+                        makeSceneTransitionAnimation(UsersActivity.this, expandedImage, "button");
                 startActivity(intent, options.toBundle());
             }
         });
 
-        if(!Session.user.isAdmin()) {
-            fab.setVisibility(View.GONE);
-        }
 
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
+                vaultApiClient.getAllUsers(new VaultApiClient.OnCallCompleted() {
                     @Override
                     public void onSuccess() {
                         refreshPage();
@@ -111,11 +86,17 @@ public class DepartmentsActivity extends BaseActivity {
             }
         });
 
-        setCollapsingToolbarLayoutTitle(getString(R.string.departments_page_title));
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        setCollapsingToolbarLayoutTitle(getString(R.string.users_page_title));
 
-        departmentsListView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
-        departmentsListView.setHasFixedSize(true);
-        departmentsListView.setLayoutManager(linearLayoutManager);
+        usersListView = (RecyclerView) findViewById(R.id.departments_list);
+        linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        usersListView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
+
+        usersListView.setHasFixedSize(true);
+        usersListView.setLayoutManager(linearLayoutManager);
+        usersRecyclerViewAdapter = new UsersRecyclerViewAdapter(this);
+        usersRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
 
         final ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
@@ -127,16 +108,16 @@ public class DepartmentsActivity extends BaseActivity {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 swipeRefreshLayout.setRefreshing(true);
-                String departmentSwiped = myDepartmentsRecyclerViewAdapter.getItemAtPosition(viewHolder.getAdapterPosition());
-                vaultApiClient.deleteDepartment(departmentSwiped, new VaultApiClient.OnCallCompleted() {
+                User userSwiped = usersRecyclerViewAdapter.getUserAtPosition(viewHolder.getAdapterPosition());
+                vaultApiClient.deleteUser(userSwiped.getId(), new VaultApiClient.OnCallCompleted() {
                     @Override
                     public void onSuccess() {
-                        vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
+                        vaultApiClient.getAllUsers(new VaultApiClient.OnCallCompleted() {
                             @Override
                             public void onSuccess() {
                                 refreshPage();
                                 swipeRefreshLayout.setRefreshing(false);
-                                Toast.makeText(getApplicationContext(), "The department was successfully deleted", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "The user was successfully deleted", Toast.LENGTH_LONG).show();
                             }
 
                             @Override
@@ -166,8 +147,25 @@ public class DepartmentsActivity extends BaseActivity {
         };
 
         itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(departmentsListView);
-        myDepartmentsRecyclerViewAdapter.setOnItemClickListener(onItemClickListener);
+        itemTouchHelper.attachToRecyclerView(usersListView);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshPage();
+    }
+
+    private void refreshPage() {
+        usersRecyclerViewAdapter.clear();
+        for(User user : Session.allUsers) {
+            if(!user.isAdmin()) {
+                usersRecyclerViewAdapter.add(user);
+            }
+        }
+
+        usersListView.setAdapter(usersRecyclerViewAdapter);
+        usersListView.setItemAnimator(new DefaultItemAnimator());
     }
 
     @Override
@@ -180,6 +178,7 @@ public class DepartmentsActivity extends BaseActivity {
         }
     }
 
+
     private void setCollapsingToolbarLayoutTitle(String title) {
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(R.color.colorPrimaryDark));
         collapsingToolbarLayout.setExpandedTitleTypeface(Typeface.DEFAULT_BOLD);
@@ -188,21 +187,18 @@ public class DepartmentsActivity extends BaseActivity {
         collapsingToolbarLayout.setTitle(title);
     }
 
-    private DepartmentsRecyclerViewAdapter.OnItemClickListener onItemClickListener = new DepartmentsRecyclerViewAdapter.OnItemClickListener() {
+    private UsersRecyclerViewAdapter.OnItemClickListener onItemClickListener = new UsersRecyclerViewAdapter.OnItemClickListener() {
         @Override
-        public void onItemClick(DepartmentsRecyclerViewAdapter.ItemHolder item, int position) {
-            String itemValue = myDepartmentsRecyclerViewAdapter.getItemAtPosition(position);
-            Session.currentDepartment = itemValue;
-            Intent intent = new Intent(DepartmentsActivity.this, ComputersActivity.class);
-            ActivityOptionsCompat options = ActivityOptionsCompat.
-                    makeSceneTransitionAnimation(DepartmentsActivity.this, item.textItemName, itemValue);
-            startActivity(intent, options.toBundle());
+        public void onItemClick(UsersRecyclerViewAdapter.ItemHolder item, int position) {
+            User itemValue = usersRecyclerViewAdapter.getUserAtPosition(position);
+            Session.currentUser = itemValue;
+            navigateToActivity(EditUserActivity.class);
         }
     };
 
     @Override
     protected int activityToInflate() {
-        return R.layout.activity_departments;
+        return R.layout.activity_users;
     }
 
 }

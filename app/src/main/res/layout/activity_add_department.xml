@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     android:fitsSystemWindows="true"
-    tools:context=".ui.AddDepartmentActivity">
+    tools:context=".ui.activities.AddDepartmentActivity">
 
     <include layout="@layout/toolbar"
         android:id="@+id/toolbar"/>

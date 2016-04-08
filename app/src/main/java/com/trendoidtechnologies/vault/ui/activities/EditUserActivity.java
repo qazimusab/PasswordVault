@@ -1,4 +1,4 @@
-package com.trendoidtechnologies.vault.ui;
+package com.trendoidtechnologies.vault.ui.activities;
 
 import android.graphics.Color;
 import android.util.Log;

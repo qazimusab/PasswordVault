@@ -1,4 +1,4 @@
-package com.trendoidtechnologies.vault.ui;
+package com.trendoidtechnologies.vault.ui.activities;
 
 import android.view.KeyEvent;
 import android.view.View;
@@ -10,64 +10,62 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.trendoidtechnologies.vault.R;
-import com.trendoidtechnologies.vault.datacontract.Credential;
+import com.trendoidtechnologies.vault.datacontract.Computer;
 import com.trendoidtechnologies.vault.service.Session;
 import com.trendoidtechnologies.vault.service.VaultApiClient;
 
-public class AddCredentialActivity extends BaseActivity {
+public class AddComputerActivity extends BaseActivity {
 
-    private EditText mUsernameEt;
-    private EditText mPasswordEt;
-    private EditText mTypeEt;
-    private Button mAddCredentialBtn;
+    private EditText mComputerEt;
+    private Button mAddComputerBtn;
     private ProgressBar mProgress;
 
     @Override
     protected void initializeView() {
-        toolbar.setTitle(getString(R.string.add_credential_page_title));
+        toolbar.setTitle(getString(R.string.add_computer_page_title));
 
-        mUsernameEt = (EditText) findViewById(R.id.add_credential_username);
-        mPasswordEt = (EditText) findViewById(R.id.add_credential_password);
-        mTypeEt = (EditText) findViewById(R.id.add_credential_type);
-        mAddCredentialBtn = (Button) findViewById(R.id.add_credential_btn);
-        mProgress = (ProgressBar) findViewById(R.id.add_credential_progress);
+        mComputerEt = (EditText) findViewById(R.id.add_computer_computer_name);
+        mAddComputerBtn = (Button) findViewById(R.id.add_computer_btn);
+        mProgress = (ProgressBar) findViewById(R.id.add_computer_progress);
 
-        mTypeEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mComputerEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.add_credential || id == EditorInfo.IME_NULL) {
-                    addCredential();
+                if (id == R.id.add_computer || id == EditorInfo.IME_NULL) {
+                    addComputer();
                     return true;
                 }
                 return false;
             }
         });
 
-        mAddCredentialBtn.setOnClickListener(addCredentialListener);
+        mAddComputerBtn.setOnClickListener(addComputerListener);
     }
 
-    private View.OnClickListener addCredentialListener = new View.OnClickListener() {
+    private View.OnClickListener addComputerListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            addCredential();
+            addComputer();
         }
     };
 
-    private void addCredential() {
-        if(mUsernameEt.getText().toString().equals("") || mPasswordEt.getText().toString().equals("") || mTypeEt.getText().toString().equals("")){
+    private void addComputer() {
+        if(mComputerEt.getText().toString().equals("")){
             Toast.makeText(getApplicationContext(), "All fields are required", Toast.LENGTH_LONG).show();
         }
         else {
             hideSoftKeyboard();
             toggleProgress(true);
-            Credential credentialToAdd = new Credential(mUsernameEt.getText().toString(), mPasswordEt.getText().toString(), mTypeEt.getText().toString(), Session.currentComputer.getComputerId());
-            vaultApiClient.addCredential(credentialToAdd, new VaultApiClient.OnCallCompleted() {
+            Computer computerToAdd = new Computer();
+            computerToAdd.setComputerName(mComputerEt.getText().toString());
+            computerToAdd.setDepartmentName(Session.currentDepartment);
+            vaultApiClient.addComputer(computerToAdd, new VaultApiClient.OnCallCompleted() {
                 @Override
                 public void onSuccess() {
                     vaultApiClient.refreshUser(new VaultApiClient.OnCallCompleted() {
                         @Override
                         public void onSuccess() {
-                            Toast.makeText(getApplicationContext(), "Your credential was added successfully!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Your computer was added successfully!", Toast.LENGTH_LONG).show();
                             onBackPressed();
                             toggleProgress(false);
                         }
@@ -87,7 +85,7 @@ public class AddCredentialActivity extends BaseActivity {
                 @Override
                 public void onUnSuccess() {
                     toggleProgress(false);
-                    Toast.makeText(getApplicationContext(), "There was an error adding your credential.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "There was an error adding your computer.", Toast.LENGTH_LONG).show();
                 }
 
                 @Override
@@ -99,16 +97,15 @@ public class AddCredentialActivity extends BaseActivity {
         }
     }
 
+
     public void toggleProgress(boolean isLoading) {
-        mAddCredentialBtn.setVisibility(isLoading ? View.GONE : View.VISIBLE);
-        mTypeEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
-        mPasswordEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
-        mUsernameEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        mAddComputerBtn.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        mComputerEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mProgress.setVisibility(isLoading ? View.VISIBLE : View.GONE);
     }
 
     @Override
     protected int activityToInflate() {
-        return R.layout.activity_add_credential;
+        return R.layout.activity_add_computer;
     }
 }
