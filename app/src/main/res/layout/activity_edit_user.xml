@@ -24,6 +24,23 @@
             android:layout_height="wrap_content">
 
             <EditText
+                android:id="@+id/edit_user_email"
+                style="@style/EditTextAppTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/fab_margin"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:singleLine="true" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
                 android:id="@+id/edit_user_first_name"
                 style="@style/EditTextAppTheme"
                 android:layout_width="match_parent"
@@ -45,62 +62,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/fab_margin"
-                android:hint="@string/last_name"
-                android:maxLines="1"
-                android:singleLine="true" />
-
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/edit_user_email"
-                style="@style/EditTextAppTheme"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:hint="@string/email"
-                android:inputType="textEmailAddress"
-                android:maxLines="1"
-                android:singleLine="true" />
-
-        </android.support.design.widget.TextInputLayout>
-
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/edit_user_password"
-                style="@style/EditTextAppTheme"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:hint="@string/password"
-                android:inputType="textPassword"
-                android:maxLines="1"
-                android:singleLine="true" />
-
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/edit_user_confirm_password"
-                style="@style/EditTextAppTheme"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:hint="@string/confirm_password"
                 android:imeActionId="@+id/update_user"
-                android:imeActionLabel="@string/action_add"
+                android:imeActionLabel="@string/update"
                 android:imeOptions="actionUnspecified"
-                android:inputType="textPassword"
+                android:hint="@string/last_name"
                 android:maxLines="1"
                 android:singleLine="true" />
 

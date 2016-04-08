@@ -248,7 +248,6 @@ public class AddUserActivity extends BaseActivity {
         mLastNameEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mPasswordEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mConfirmPasswordEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
-        mLastNameEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mAddUserBtn.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         permissionsSpinner.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mProgress.setVisibility(isLoading ? View.VISIBLE : View.GONE);

@@ -24,8 +24,6 @@ import java.util.List;
 public class EditUserActivity extends BaseActivity {
 
     private EditText mEmailEt;
-    private EditText mPasswordEt;
-    private EditText mConfirmPasswordEt;
     private EditText mFirstNameEt;
     private EditText mLastNameEt;
     private Button mUpdateUserBtn;
@@ -41,12 +39,10 @@ public class EditUserActivity extends BaseActivity {
         mEmailEt = (EditText) findViewById(R.id.edit_user_email);
         mFirstNameEt = (EditText) findViewById(R.id.edit_user_first_name);
         mLastNameEt = (EditText) findViewById(R.id.edit_user_last_name);
-        mPasswordEt = (EditText) findViewById(R.id.edit_user_password);
-        mConfirmPasswordEt = (EditText) findViewById(R.id.edit_user_confirm_password);
         mProgress = (ProgressBar) findViewById(R.id.edit_user_progress);
         mUpdateUserBtn = (Button) findViewById(R.id.edit_user_btn);
 
-        mConfirmPasswordEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mLastNameEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.update_user || id == EditorInfo.IME_NULL) {
@@ -58,6 +54,7 @@ public class EditUserActivity extends BaseActivity {
         });
 
         mEmailEt.setText(Session.currentUser.getEmail());
+        mEmailEt.setKeyListener(null);
         mFirstNameEt.setText(Session.currentUser.getFirstName());
         mLastNameEt.setText(Session.currentUser.getLastName());
 
@@ -108,28 +105,20 @@ public class EditUserActivity extends BaseActivity {
         }
     };
 
-    public boolean areAllFieldsFilled(String firstName, String lastName, String email, String password, String confirmPassword) {
+    public boolean areAllFieldsFilled(String firstName, String lastName, String email) {
         return !firstName.equals("")
                 && !lastName.equals("")
-                && !email.equals("")
-                && !password.equals("")
-                && !confirmPassword.equals("");
+                && !email.equals("");
     }
 
     private void updateUser() {
         String firstName = mFirstNameEt.getText().toString();
         String lastName = mLastNameEt.getText().toString();
         String email = mEmailEt.getText().toString();
-        String password = mPasswordEt.getText().toString();
-        String confirmPassword = mConfirmPasswordEt.getText().toString();
-        if (!areAllFieldsFilled(firstName, lastName, email, password, confirmPassword)) {
+        if (!areAllFieldsFilled(firstName, lastName, email)) {
             Toast.makeText(getApplicationContext(), "All fields are required", Toast.LENGTH_LONG).show();
         } else if (!isEmailValid(email)) {
             Toast.makeText(getApplicationContext(), "Email is not valid", Toast.LENGTH_LONG).show();
-        } else if (!isPasswordValid(password)) {
-            Toast.makeText(getApplicationContext(), "Password must contain at least 8 characters, one capital letter, and one special character.", Toast.LENGTH_LONG).show();
-        } else if (!password.equals(confirmPassword)) {
-            Toast.makeText(getApplicationContext(), "Passwords do not match.", Toast.LENGTH_LONG).show();
         } else {
             hideSoftKeyboard();
             toggleProgress(true);
@@ -145,8 +134,6 @@ public class EditUserActivity extends BaseActivity {
             userToUpdate.setEmail(email);
             userToUpdate.setFirstName(firstName);
             userToUpdate.setLastName(lastName);
-            userToUpdate.setPassword(password);
-            userToUpdate.setConfirmPassword(confirmPassword);
             userToUpdate.setPermissions(updatedPermissions);
 
             vaultApiClient.updateUser(userToUpdate, new VaultApiClient.OnCallCompleted() {
@@ -155,7 +142,7 @@ public class EditUserActivity extends BaseActivity {
                     vaultApiClient.getAllUsers(new VaultApiClient.OnCallCompleted() {
                         @Override
                         public void onSuccess() {
-                            Toast.makeText(getApplicationContext(), "User was added successfully!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "User was updated successfully!", Toast.LENGTH_LONG).show();
                             onBackPressed();
                             toggleProgress(false);
                         }
@@ -214,12 +201,9 @@ public class EditUserActivity extends BaseActivity {
     }
 
     public void toggleProgress(boolean isLoading) {
-        mEmailEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mFirstNameEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mLastNameEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
-        mPasswordEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
-        mConfirmPasswordEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
-        mLastNameEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        mEmailEt.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mUpdateUserBtn.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         permissionsSpinner.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         mProgress.setVisibility(isLoading ? View.VISIBLE : View.GONE);
