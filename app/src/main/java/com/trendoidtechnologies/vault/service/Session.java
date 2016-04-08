@@ -1,7 +1,6 @@
 package com.trendoidtechnologies.vault.service;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
@@ -18,7 +17,7 @@ import java.util.List;
 import trendoidtechnologies.com.navigationdrawerlibrary.structure.DrawerProfile;
 
 /**
- * Created by qazimusab on 4/5/16.
+ * Created by qazimusab on 4/7/16.
  */
 public class Session {
 

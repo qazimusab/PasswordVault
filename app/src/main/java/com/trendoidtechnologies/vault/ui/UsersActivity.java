@@ -16,7 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.trendoidtechnologies.vault.R;
-import com.trendoidtechnologies.vault.datacontract.Computer;
 import com.trendoidtechnologies.vault.datacontract.User;
 import com.trendoidtechnologies.vault.service.Session;
 import com.trendoidtechnologies.vault.service.VaultApiClient;
