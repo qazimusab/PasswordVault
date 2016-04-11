@@ -51,7 +51,7 @@ public class ComputersActivity extends BaseActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         refreshPage();
     }

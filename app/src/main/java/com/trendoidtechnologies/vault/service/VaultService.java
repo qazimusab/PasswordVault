@@ -32,8 +32,6 @@ import retrofit2.http.Query;
  * Created by qazimusab on 3/30/16.
  */
 public interface VaultService {
-    //Retrofit turns our institute WEB API into a Java interface.
-    //So these are the list available in our WEB API and the methods look straight forward
 
     class Factory {
         private static final String BASE_URL = "https://passwordvaultapi.azurewebsites.net/";
@@ -84,7 +82,7 @@ public interface VaultService {
     Call<Permission> addDepartment(@Header("Authorization") String token, @Body Permission department);
 
     @POST("api/Account/Register")
-    Call<Void> addUser(@Body User user);
+    Call<Void> addUser(@Header("Authorization") String token, @Body User user);
 
     @DELETE("api/Departments")
     Call<Permission> deleteDepartment(@Header("Authorization") String token, @Query("name") String departmentName);

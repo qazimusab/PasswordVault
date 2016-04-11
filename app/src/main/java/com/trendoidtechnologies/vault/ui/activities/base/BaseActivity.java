@@ -3,6 +3,8 @@ package com.trendoidtechnologies.vault.ui.activities.base;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -10,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -37,6 +40,7 @@ public abstract class BaseActivity extends DrawerActivity {
     private Bundle extras;
     protected Toolbar toolbar;
     private List<DrawerItem> navigationItems;
+    private static final long DISCONNECT_TIMEOUT = 60000;
 
     public enum NavigationItem {
         DEPARTMENTS,
@@ -62,6 +66,47 @@ public abstract class BaseActivity extends DrawerActivity {
         } else {
             setDrawer();
         }
+    }
+
+    private Handler disconnectHandler = new Handler(){
+        public void handleMessage(Message msg) {
+        }
+    };
+
+    private Runnable disconnectCallback = new Runnable() {
+        @Override
+        public void run() {
+            Log.d("TIMER_HIT", "Logging out");
+            if(!(BaseActivity.this instanceof LoginActivity)) {
+                navigateToItem(NavigationItem.LOGOUT);
+            }
+        }
+    };
+
+    public void resetDisconnectTimer(){
+        disconnectHandler.removeCallbacks(disconnectCallback);
+        disconnectHandler.postDelayed(disconnectCallback, DISCONNECT_TIMEOUT);
+    }
+
+    public void stopDisconnectTimer(){
+        disconnectHandler.removeCallbacks(disconnectCallback);
+    }
+
+    @Override
+    public void onUserInteraction(){
+        resetDisconnectTimer();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        resetDisconnectTimer();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        stopDisconnectTimer();
     }
 
     protected void setDrawer() {
@@ -154,7 +199,8 @@ public abstract class BaseActivity extends DrawerActivity {
                 break;
             case LOGOUT:
                 Session.clearSession();
-                navigateToActivity(LoginActivity.class);
+                navigateToActivity(LoginActivity.class, true);
+                finish();
                 break;
         }
     }
@@ -199,10 +245,13 @@ public abstract class BaseActivity extends DrawerActivity {
     protected void navigateToActivity(Class activity, boolean clearTop) {
         Intent intent = new Intent(this, activity);
         if (clearTop) {
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         }
         startActivity(intent);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        if(clearTop) {
+            finish();
+        }
     }
 
     public Bundle getExtras() {

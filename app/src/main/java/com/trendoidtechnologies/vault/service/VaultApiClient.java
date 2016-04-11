@@ -44,10 +44,9 @@ public class VaultApiClient {
         vaultService.addComputer("Bearer " + Session.token.getAccessToken(), computer).enqueue(new Callback<Computer>() {
             @Override
             public void onResponse(Call<Computer> call, Response<Computer> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     onCallCompleted.onSuccess();
-                }
-                else {
+                } else {
                     onCallCompleted.onUnSuccess();
                 }
             }
@@ -63,10 +62,9 @@ public class VaultApiClient {
         vaultService.addDepartment("Bearer " + Session.token.getAccessToken(), department).enqueue(new Callback<Permission>() {
             @Override
             public void onResponse(Call<Permission> call, Response<Permission> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     onCallCompleted.onSuccess();
-                }
-                else {
+                } else {
                     onCallCompleted.onUnSuccess();
                 }
             }
@@ -82,10 +80,9 @@ public class VaultApiClient {
         vaultService.addCredential("Bearer " + Session.token.getAccessToken(), credential).enqueue(new Callback<Credential>() {
             @Override
             public void onResponse(Call<Credential> call, Response<Credential> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     onCallCompleted.onSuccess();
-                }
-                else {
+                } else {
                     onCallCompleted.onUnSuccess();
                 }
             }
@@ -99,13 +96,12 @@ public class VaultApiClient {
 
     public void addUser(User user, final OnCallCompleted onCallCompleted) {
         user.setIsAdmin(false);
-        vaultService.addUser(user).enqueue(new Callback<Void>() {
+        vaultService.addUser("Bearer " + Session.token.getAccessToken(), user).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     onCallCompleted.onSuccess();
-                }
-                else {
+                } else {
                     onCallCompleted.onUnSuccess();
                 }
             }
@@ -121,11 +117,10 @@ public class VaultApiClient {
         vaultService.getUser("Bearer " + Session.token.getAccessToken(), Session.user.getEmail()).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     Session.user = response.body();
                     onUserRefreshed.onSuccess();
-                }
-                else {
+                } else {
                     onUserRefreshed.onUnSuccess();
                 }
             }
@@ -141,10 +136,9 @@ public class VaultApiClient {
         vaultService.updateUser("Bearer " + Session.token.getAccessToken(), user, user.getId()).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     onCallCompleted.onSuccess();
-                }
-                else {
+                } else {
                     onCallCompleted.onUnSuccess();
                 }
             }
@@ -160,11 +154,10 @@ public class VaultApiClient {
         vaultService.getAllUsers("Bearer " + Session.token.getAccessToken()).enqueue(new Callback<List<User>>() {
             @Override
             public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     Session.allUsers = response.body();
                     onCallCompleted.onSuccess();
-                }
-                else {
+                } else {
                     onCallCompleted.onUnSuccess();
                 }
             }
@@ -180,10 +173,9 @@ public class VaultApiClient {
         vaultService.deleteDepartment("Bearer " + Session.token.getAccessToken(), departmentName).enqueue(new Callback<Permission>() {
             @Override
             public void onResponse(Call<Permission> call, Response<Permission> response) {
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     onCallCompleted.onSuccess();
-                }
-                else {
+                } else {
                     onCallCompleted.onUnSuccess();
                 }
             }
@@ -199,10 +191,9 @@ public class VaultApiClient {
         vaultService.deleteComputer("Bearer " + Session.token.getAccessToken(), computerId).enqueue(new Callback<Computer>() {
             @Override
             public void onResponse(Call<Computer> call, Response<Computer> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     onCallCompleted.onSuccess();
-                }
-                else {
+                } else {
                     onCallCompleted.onUnSuccess();
                 }
             }
@@ -218,10 +209,9 @@ public class VaultApiClient {
         vaultService.deleteCredential("Bearer " + Session.token.getAccessToken(), credentialId).enqueue(new Callback<Credential>() {
             @Override
             public void onResponse(Call<Credential> call, Response<Credential> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     onCallCompleted.onSuccess();
-                }
-                else {
+                } else {
                     onCallCompleted.onUnSuccess();
                 }
             }
@@ -237,10 +227,9 @@ public class VaultApiClient {
         vaultService.deleteUser("Bearer " + Session.token.getAccessToken(), userId).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     onCallCompleted.onSuccess();
-                }
-                else {
+                } else {
                     onCallCompleted.onUnSuccess();
                 }
             }
@@ -256,10 +245,9 @@ public class VaultApiClient {
         vaultService.updateCredential("Bearer " + Session.token.getAccessToken(), credentialToUpdate, credentialToUpdate.getId()).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     onCallCompleted.onSuccess();
-                }
-                else {
+                } else {
                     onCallCompleted.onUnSuccess();
                 }
             }
@@ -273,7 +261,9 @@ public class VaultApiClient {
 
     public interface OnCallCompleted {
         void onSuccess();
+
         void onUnSuccess();
+
         void onFailure();
     }
 }

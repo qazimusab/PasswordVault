@@ -19,6 +19,8 @@ import com.trendoidtechnologies.vault.session.Session;
 import com.trendoidtechnologies.vault.service.VaultService;
 import com.trendoidtechnologies.vault.ui.activities.base.BaseActivity;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -36,6 +38,9 @@ public class LoginActivity extends BaseActivity {
     private EditText mPasswordView;
     private ProgressBar mProgressView;
     private LinearLayout linearLayout;
+    private int incorrectLoginCount = 0;
+    private long thirdIncorrectAttempTimestamp = 0;
+    private SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 
     @Override
     protected void initializeView() {
@@ -86,6 +91,17 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void login(){
+        if(incorrectLoginCount == 3 && thirdIncorrectAttempTimestamp != 0) {
+            long totalMillisElapsed = new Date().getTime() - thirdIncorrectAttempTimestamp;
+            if(totalMillisElapsed > 30000) {
+                incorrectLoginCount = 0;
+                thirdIncorrectAttempTimestamp = 0;
+            }
+            else {
+                Toast.makeText(getApplicationContext(), "You have authenticated incorrectly three times. You must wait " + (30 - (totalMillisElapsed / 1000)) + " more seconds before trying again.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
         if(mEmailView.getText().toString().equals("") || mPasswordView.getText().toString().equals("")){
             Toast.makeText(getApplicationContext(), "All fields are required.", Toast.LENGTH_LONG).show();
         }
@@ -93,7 +109,14 @@ public class LoginActivity extends BaseActivity {
             Toast.makeText(getApplicationContext(), "Your email is invalid.", Toast.LENGTH_LONG).show();
         }
         else if(!isPasswordValid(mPasswordView.getText().toString())){
-            Toast.makeText(getApplicationContext(), "You email or password is incorrect.", Toast.LENGTH_LONG).show();
+            incorrectLoginCount++;
+            if(incorrectLoginCount == 3) {
+                thirdIncorrectAttempTimestamp = new Date().getTime();
+                Toast.makeText(getApplicationContext(), "You email or password is incorrect for the third time. You must wait 30 seconds to try again.", Toast.LENGTH_LONG).show();
+            }
+            else {
+                Toast.makeText(getApplicationContext(), "You email or password is incorrect.", Toast.LENGTH_LONG).show();
+            }
         }
         else {
             hideSoftKeyboard();
@@ -151,7 +174,14 @@ public class LoginActivity extends BaseActivity {
                     } else {
                         toggleProgress(false);
                         Session.clearSession();
-                        Toast.makeText(getApplicationContext(), "You email or password is incorrect.", Toast.LENGTH_LONG).show();
+                        incorrectLoginCount++;
+                        if(incorrectLoginCount == 3) {
+                            thirdIncorrectAttempTimestamp = new Date().getTime();
+                            Toast.makeText(getApplicationContext(), "You email or password is incorrect for the third time. You must wait 30 seconds to try again.", Toast.LENGTH_LONG).show();
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(), "You email or password is incorrect.", Toast.LENGTH_LONG).show();
+                        }
                     }
                 }
 
@@ -159,7 +189,7 @@ public class LoginActivity extends BaseActivity {
                 public void onFailure(Call<Token> call, Throwable t) {
                     toggleProgress(false);
                     Session.clearSession();
-                    Toast.makeText(getApplicationContext(), "You email or password is incorrect.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Something went wrong..", Toast.LENGTH_LONG).show();
                 }
             });
         }
