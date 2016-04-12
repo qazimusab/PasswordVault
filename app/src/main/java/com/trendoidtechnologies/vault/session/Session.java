@@ -62,7 +62,7 @@ public class Session {
     public static void cacheAssets(Context context){
         if(lruCache == null) {
             lruCache = new LruCache<>(5);
-            lruCache.put(PROFILE_AVATAR, ContextCompat.getDrawable(context, R.drawable.profile_avatar));
+            lruCache.put(PROFILE_AVATAR, ContextCompat.getDrawable(context, R.drawable.enda_sullivan_profile_avatar));
             lruCache.put(NAV_DRAWER_HEADER, ContextCompat.getDrawable(context, R.drawable.nav_drawer_header));
             lruCache.put(LIST_VIEW_HEADER, ContextCompat.getDrawable(context, R.drawable.list_view_header));
         }
